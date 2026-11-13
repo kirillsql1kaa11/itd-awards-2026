@@ -1,0 +1,207 @@
+import { useRef, useState } from 'react'
+import { Link } from 'react-router-dom'
+import {
+  AlertTriangle,
+  ArrowRight,
+  ArrowUpRight,
+  Check,
+  CheckCircle2,
+  Pencil,
+  RotateCcw,
+  Vote,
+} from 'lucide-react'
+import { PageHero } from '../components/PageHero'
+import { CategoryIcon } from '../components/CategoryIcon'
+import { ProgressCard } from '../components/ProgressCard'
+import { categories, groupLabels } from '../data/categories'
+import { EVENT } from '../data/event'
+import { useVotes } from '../context/VotesContext'
+import { useToast } from '../context/ToastContext'
+import { usePageTitle } from '../hooks/usePageTitle'
+
+export function MyVotes() {
+  usePageTitle('Мой голос')
+  const { votes, votedCount, resetVotes } = useVotes()
+  const { showToast } = useToast()
+  const [confirmOpen, setConfirmOpen] = useState(false)
+  const cancelButtonRef = useRef<HTMLButtonElement>(null)
+
+  const savedCategories = categories.filter((categoryItem) => votes[categoryItem.id])
+
+  const requestReset = () => {
+    setConfirmOpen(true)
+    window.setTimeout(() => cancelButtonRef.current?.focus(), 0)
+  }
+
+  const confirmReset = () => {
+    resetVotes()
+    setConfirmOpen(false)
+    showToast('Все голоса сброшены. Можно начать заново.', 'info')
+  }
+
+  return (
+    <div className="my-votes-page">
+      <PageHero
+        eyebrow="Личный прогресс"
+        title={
+          <>
+            Мой <em>голос.</em>
+          </>
+        }
+        description="Здесь собрано всё, что вы уже выбрали. Голос можно изменить до конца голосования — прогресс сохраняется в этом браузере."
+        ghost="2026"
+        aside={<ProgressCard value={votedCount} total={categories.length} label="Голосование" />}
+      />
+
+      <section className="section my-votes-section">
+        <div className="container">
+          {savedCategories.length > 0 ? (
+            <>
+              <div className="my-votes-head">
+                <div>
+                  <p className="eyebrow">Ваши выборы</p>
+                  <h2 className="display">Уже в списке</h2>
+                </div>
+                <div className="my-votes-head__side">
+                  <span className="progress-note">
+                    <CheckCircle2 size={15} aria-hidden="true" />
+                    {votedCount} из {categories.length} номинаций
+                  </span>
+                  <span className="my-votes-head__deadline">
+                    Изменить можно до {EVENT.votingEndLabel}
+                  </span>
+                </div>
+              </div>
+
+              <div className="votes-grid">
+                {savedCategories.map((categoryItem) => {
+                  const picks = categoryItem.nominees.filter((nomineeItem) =>
+                    votes[categoryItem.id]?.picks.includes(nomineeItem.id),
+                  )
+                  return (
+                    <article className="vote-card" key={categoryItem.id}>
+                      <div className="vote-card__head">
+                        <span className="vote-card__icon" aria-hidden="true">
+                          <CategoryIcon id={categoryItem.id} size={24} />
+                        </span>
+                        <div className="vote-card__title">
+                          <span>{groupLabels[categoryItem.group]}</span>
+                          <h2>
+                            <Link to={`/nominations/${categoryItem.id}`}>
+                              {categoryItem.title}
+                            </Link>
+                          </h2>
+                        </div>
+                        <span className="vote-card__check" aria-hidden="true">
+                          <Check size={17} strokeWidth={3} />
+                        </span>
+                      </div>
+
+                      <ul className="vote-card__picks">
+                        {picks.map((nomineeItem) => (
+                          <li key={nomineeItem.id}>
+                            <span className="vote-card__pick-check" aria-hidden="true">
+                              <Check size={11} strokeWidth={3} />
+                            </span>
+                            <span>
+                              <strong>{nomineeItem.name}</strong>
+                              <small>{nomineeItem.handle}</small>
+                            </span>
+                          </li>
+                        ))}
+                      </ul>
+
+                      <div className="vote-card__foot">
+                        <span>Голос учтён</span>
+                        <Link to={`/nominations/${categoryItem.id}`} className="vote-card__edit">
+                          Изменить
+                          <Pencil size={13} aria-hidden="true" />
+                        </Link>
+                      </div>
+                    </article>
+                  )
+                })}
+              </div>
+
+              <div className="my-votes-actions">
+                <Link to="/nominations" className="button button--gold">
+                  Продолжить голосование
+                  <ArrowRight size={17} aria-hidden="true" />
+                </Link>
+                <button type="button" className="text-button text-button--danger" onClick={requestReset}>
+                  <RotateCcw size={14} aria-hidden="true" />
+                  Сбросить все голоса
+                </button>
+              </div>
+            </>
+          ) : (
+            <div className="empty-state empty-state--large">
+              <span className="empty-state__icon" aria-hidden="true">
+                <Vote size={30} />
+              </span>
+              <p className="eyebrow">Пока пусто</p>
+              <h2>Голос ещё не отдан</h2>
+              <p>
+                Выберите хотя бы одну номинацию — и здесь появится ваш личный список
+                победителей. Начать можно с любой категории.
+              </p>
+              <div className="empty-state__actions">
+                <Link to="/nominations" className="button button--gold">
+                  Выбрать номинантов
+                  <ArrowUpRight size={17} aria-hidden="true" />
+                </Link>
+                <Link to="/results" className="button button--ghost">
+                  Смотреть результаты
+                </Link>
+              </div>
+            </div>
+          )}
+
+          {confirmOpen && savedCategories.length > 0 && (
+            <div
+              className="reset-confirm"
+              role="alertdialog"
+              aria-labelledby="reset-title"
+              aria-describedby="reset-description"
+            >
+              <span className="reset-confirm__icon" aria-hidden="true">
+                <AlertTriangle size={22} />
+              </span>
+              <div className="reset-confirm__body">
+                <h2 id="reset-title">Сбросить все голоса?</h2>
+                <p id="reset-description">
+                  Все сохранённые выборы в {categories.length} номинациях будут удалены из
+                  этого браузера. Отменить действие не получится.
+                </p>
+              </div>
+              <div className="reset-confirm__actions">
+                <button
+                  type="button"
+                  className="button button--ghost button--sm"
+                  onClick={() => setConfirmOpen(false)}
+                  ref={cancelButtonRef}
+                >
+                  Отмена
+                </button>
+                <button type="button" className="button button--danger button--sm" onClick={confirmReset}>
+                  Да, сбросить
+                </button>
+              </div>
+            </div>
+          )}
+
+          <div className="my-votes-note">
+            <p>
+              Голоса хранятся локально в вашем браузере. Это демо-проект без сервера:
+              данные никуда не отправляются и не привязаны к аккаунту.
+            </p>
+            <Link to="/about#faq" className="link-inline">
+              Вопросы и ответы
+              <ArrowUpRight size={14} aria-hidden="true" />
+            </Link>
+          </div>
+        </div>
+      </section>
+    </div>
+  )
+}
