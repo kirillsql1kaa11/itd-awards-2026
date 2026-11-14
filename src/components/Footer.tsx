@@ -22,7 +22,6 @@ export function Footer() {
           <nav className="footer__col" aria-label="Навигация в подвале">
             <h2>Навигация</h2>
             <Link to="/nominations">Номинации</Link>
-            <Link to="/results">Результаты</Link>
             <Link to="/my-votes">Мой голос</Link>
           </nav>
 
@@ -31,7 +30,6 @@ export function Footer() {
             <Link to="/about">О проекте</Link>
             <Link to="/about#rules">Правила</Link>
             <Link to="/about#faq">FAQ</Link>
-            <Link to="/ceremony">Церемония</Link>
           </nav>
 
           <div className="footer__col">

@@ -8,15 +8,18 @@ import { CategoryIcon } from './CategoryIcon'
 export function CategoryRow({ category }: { category: Category }) {
   const { votes } = useVotes()
   const picks = votes[category.id]?.picks ?? []
-  const isVoted = picks.length > 0
+  const selectedNominee = category.nominees.find((nomineeItem) =>
+    picks.includes(nomineeItem.id),
+  )
+  const isVoted = Boolean(selectedNominee)
 
   return (
     <Link
       to={`/nominations/${category.id}`}
       className={`category-row ${isVoted ? 'is-voted' : ''}`}
       aria-label={`${category.title}. ${groupLabels[category.group]}. ${
-        isVoted ? 'Голос учтён.' : 'Голос пока не отдан.'
-      } Один голос.`}
+        selectedNominee ? `Ваш выбор: ${selectedNominee.name}.` : 'Голос пока не отдан.'
+      }`}
     >
       <span className="category-row__icon" aria-hidden="true">
         <CategoryIcon id={category.id} size={26} />
@@ -26,7 +29,11 @@ export function CategoryRow({ category }: { category: Category }) {
         <span className="category-row__meta">
           <span>{groupLabels[category.group]}</span>
           <span className="category-row__dot" aria-hidden="true" />
-          <span>Один голос</span>
+          {selectedNominee ? (
+            <span className="category-row__pick">Ваш выбор: {selectedNominee.name}</span>
+          ) : (
+            <span>Один голос</span>
+          )}
         </span>
       </span>
       <span className="category-row__status" aria-hidden="true">

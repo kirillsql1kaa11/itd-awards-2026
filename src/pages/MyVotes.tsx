@@ -5,14 +5,12 @@ import {
   ArrowRight,
   ArrowUpRight,
   Check,
-  CheckCircle2,
   Pencil,
   RotateCcw,
   Vote,
 } from 'lucide-react'
 import { PageHero } from '../components/PageHero'
 import { CategoryIcon } from '../components/CategoryIcon'
-import { ProgressCard } from '../components/ProgressCard'
 import { categories, groupLabels } from '../data/categories'
 import { EVENT } from '../data/event'
 import { useVotes } from '../context/VotesContext'
@@ -21,7 +19,7 @@ import { usePageTitle } from '../hooks/usePageTitle'
 
 export function MyVotes() {
   usePageTitle('Мой голос')
-  const { votes, votedCount, resetVotes } = useVotes()
+  const { votes, resetVotes } = useVotes()
   const { showToast } = useToast()
   const [confirmOpen, setConfirmOpen] = useState(false)
   const cancelButtonRef = useRef<HTMLButtonElement>(null)
@@ -48,9 +46,8 @@ export function MyVotes() {
             Мой <em>голос.</em>
           </>
         }
-        description="Здесь собрано всё, что вы уже выбрали. Голос можно изменить до конца голосования — прогресс сохраняется в этом браузере."
+        description="Здесь собрано всё, что вы уже выбрали. Голос можно изменить до конца голосования — выбор сохраняется в этом браузере."
         ghost="2026"
-        aside={<ProgressCard value={votedCount} total={categories.length} label="Голосование" />}
       />
 
       <section className="section my-votes-section">
@@ -63,10 +60,6 @@ export function MyVotes() {
                   <h2 className="display">Уже в списке</h2>
                 </div>
                 <div className="my-votes-head__side">
-                  <span className="progress-note">
-                    <CheckCircle2 size={15} aria-hidden="true" />
-                    {votedCount} из {categories.length} номинаций
-                  </span>
                   <span className="my-votes-head__deadline">
                     Изменить можно до {EVENT.votingEndLabel}
                   </span>
@@ -150,8 +143,8 @@ export function MyVotes() {
                   Выбрать номинантов
                   <ArrowUpRight size={17} aria-hidden="true" />
                 </Link>
-                <Link to="/results" className="button button--ghost">
-                  Смотреть результаты
+                <Link to="/about" className="button button--ghost">
+                  Как это работает
                 </Link>
               </div>
             </div>

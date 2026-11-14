@@ -4,11 +4,13 @@ import type { CSSProperties, RefObject } from 'react'
 import {
   ArrowLeft,
   ArrowRight,
+  ArrowUpRight,
   Check,
   CheckCircle2,
   Clock3,
   Info,
   Lock,
+  Music2,
   Pencil,
   Share2,
   X,
@@ -19,7 +21,7 @@ import { EVENT } from '../data/event'
 import { useVotes } from '../context/VotesContext'
 import { useToast } from '../context/ToastContext'
 import { usePageTitle } from '../hooks/usePageTitle'
-import { makeInitials, makeTone, pluralize } from '../lib/format'
+import { makeInitials, makeTone } from '../lib/format'
 import { CategoryIcon } from '../components/CategoryIcon'
 import { NotFound } from './NotFound'
 
@@ -133,11 +135,6 @@ function CategoryView({ category }: { category: Category }) {
               <p className="category-description">{category.description}</p>
               <div className="meta-pills">
                 <span className="meta-pill">
-                  <Info size={14} aria-hidden="true" />
-                  {category.nominees.length}{' '}
-                  {pluralize(category.nominees.length, 'номинант', 'номинанта', 'номинантов')}
-                </span>
-                <span className="meta-pill">
                   <CheckCircle2 size={14} aria-hidden="true" />
                   Один голос
                 </span>
@@ -241,14 +238,6 @@ function CategoryView({ category }: { category: Category }) {
               <h2 id="vote-panel-title">
                 {saved && !editing ? 'Голос учтён' : 'Сделайте выбор'}
               </h2>
-
-              {saved && !editing && (
-                <p className="vote-panel__success" role="status">
-                  <Check size={15} aria-hidden="true" />
-                  Выбрано: {selectedNominees.length}{' '}
-                  {pluralize(selectedNominees.length, 'номинант', 'номинанта', 'номинантов')}
-                </p>
-              )}
 
               <ul className="picked-list">
                 {selectedNominees.length > 0 ? (
@@ -371,30 +360,46 @@ function NomineeCard({
   } as CSSProperties
 
   return (
-    <button
-      ref={buttonRef}
-      type="button"
-      className={`nominee ${selected ? 'is-selected' : ''}`}
-      aria-pressed={selected}
-      disabled={!editing}
-      onClick={onToggle}
+    <article
+      className={`nominee ${selected ? 'is-selected' : ''} ${editing ? '' : 'is-locked'}`}
     >
+      <button
+        ref={buttonRef}
+        type="button"
+        className="nominee__toggle"
+        aria-pressed={selected}
+        aria-label={selected ? `${nominee.name} — выбран` : `Выбрать ${nominee.name}`}
+        disabled={!editing}
+        onClick={onToggle}
+      />
       <span className="nominee__avatar" style={avatarStyle} aria-hidden="true">
         <span className="nominee__initials">{makeInitials(nominee.name)}</span>
       </span>
       <span className="nominee__body">
         <span className="nominee__top">
           <span className="nominee__name">{nominee.name}</span>
-          <span className="nominee__handle">{nominee.handle}</span>
+          <a
+            className="nominee__profile"
+            href={nominee.profile}
+            target="_blank"
+            rel="noreferrer"
+            aria-label={`Профиль ${nominee.name} в Telegram`}
+          >
+            {nominee.handle}
+            <ArrowUpRight size={10} aria-hidden="true" />
+          </a>
         </span>
         <span className="nominee__tagline">{nominee.tagline}</span>
+        {nominee.song && (
+          <span className="nominee__song">
+            <Music2 size={11} aria-hidden="true" />
+            Песня: {nominee.song}
+          </span>
+        )}
       </span>
-      <span
-        className="nominee__control"
-        aria-hidden="true"
-      >
+      <span className="nominee__control" aria-hidden="true">
         {selected && <Check size={15} strokeWidth={3} />}
       </span>
-    </button>
+    </article>
   )
 }

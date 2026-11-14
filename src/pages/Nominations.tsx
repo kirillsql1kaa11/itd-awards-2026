@@ -2,7 +2,6 @@ import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { ArrowRight, SearchX } from 'lucide-react'
 import { PageHero } from '../components/PageHero'
-import { ProgressCard } from '../components/ProgressCard'
 import { SearchField } from '../components/SearchField'
 import { CategoryRow } from '../components/CategoryRow'
 import { categories } from '../data/categories'
@@ -19,7 +18,7 @@ const filterLabels: Record<Filter, string> = {
 
 export function Nominations() {
   usePageTitle('Номинации')
-  const { votes, votedCount } = useVotes()
+  const { votes } = useVotes()
   const [query, setQuery] = useState('')
   const [filter, setFilter] = useState<Filter>('all')
 
@@ -81,7 +80,6 @@ export function Nominations() {
         }
         description="Голосуй за людей, проекты и мемы, которые сделали этот год. В каждой номинации — один голос. Выбор можно изменить до 20 декабря."
         ghost="17"
-        aside={<ProgressCard value={votedCount} total={categories.length} />}
       />
 
       <section className="section nominations-section">

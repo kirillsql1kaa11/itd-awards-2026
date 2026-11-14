@@ -11,11 +11,10 @@ import {
 } from 'lucide-react'
 import { PageHero } from '../components/PageHero'
 import { Reveal } from '../components/Reveal'
-import { categories, totalNominees } from '../data/categories'
+import { categories } from '../data/categories'
 import { EVENT } from '../data/event'
 import { telegramChannels, telegramContacts } from '../data/contacts'
 import { usePageTitle } from '../hooks/usePageTitle'
-import { pluralize } from '../lib/format'
 
 const timeline = [
   {
@@ -30,8 +29,8 @@ const timeline = [
   },
   {
     date: '27 декабря',
-    title: 'Церемония и победители',
-    text: 'Объявляем первых победителей ITD AWARDS. Золото, речи и, конечно, немного мемов.',
+    title: 'Победители',
+    text: 'Объявляем первых победителей ITD AWARDS — только имена, золото и благодарности сообществу.',
   },
 ]
 
@@ -81,12 +80,12 @@ const faq = [
   },
   {
     question: 'Когда объявят победителей?',
-    answer: `Победителей объявим на церемонии ${EVENT.ceremonyLabel}. Результаты появятся на сайте и в сообществе ITD.`,
+    answer: `Победителей объявим ${EVENT.winnersLabel}. Итоги появятся на сайте и в сообществе ITD.`,
   },
   {
     question: 'Почему в некоторых номинациях несколько номинантов?',
     answer:
-      'Список каждого сезона формирует сообщество. В этом году в номинациях от 4 до 5 участников, но голос в каждой категории только один.',
+      'Список каждого сезона формирует сообщество. В каждой категории несколько участников, но голос только один.',
   },
 ]
 
@@ -115,10 +114,6 @@ export function About() {
             <div>
               <strong>{categories.length}</strong>
               <span>номинаций</span>
-            </div>
-            <div>
-              <strong>{totalNominees}</strong>
-              <span>{pluralize(totalNominees, 'номинант', 'номинанта', 'номинантов')}</span>
             </div>
           </div>
         }
@@ -165,7 +160,7 @@ export function About() {
               </h2>
             </div>
             <p className="section-head__note">
-              Два этапа и финальная церемония — от предложений сообщества до первых имён.
+              Два этапа — от предложений сообщества до первых имён.
             </p>
           </div>
           <div className="timeline" role="list">

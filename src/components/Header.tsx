@@ -2,23 +2,18 @@ import { useEffect, useRef, useState } from 'react'
 import { Link, NavLink, useLocation } from 'react-router-dom'
 import { ArrowUpRight, Menu, Vote, X } from 'lucide-react'
 import { EVENT } from '../data/event'
-import { categories } from '../data/categories'
-import { useVotes } from '../context/VotesContext'
 import { Logo } from './Logo'
-import { ProgressRing } from './ProgressRing'
 
 const navItems = [
   { to: '/nominations', label: 'Номинации' },
-  { to: '/results', label: 'Результаты' },
+  { to: '/my-votes', label: 'Мой голос' },
   { to: '/about', label: 'О премии' },
-  { to: '/ceremony', label: 'Церемония' },
 ]
 
 export function Header() {
   const [menuOpen, setMenuOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const location = useLocation()
-  const { votedCount } = useVotes()
   const menuRef = useRef<HTMLDivElement>(null)
   const closeButtonRef = useRef<HTMLButtonElement>(null)
 
@@ -107,17 +102,6 @@ export function Header() {
           </nav>
 
           <div className="header__actions">
-            <Link
-              to="/my-votes"
-              className="progress-chip"
-              aria-label={`Мой голос: заполнено ${votedCount} из ${categories.length} номинаций`}
-            >
-              <ProgressRing value={votedCount} total={categories.length} size={25} stroke={9} />
-              <span>
-                {votedCount}/{categories.length}
-              </span>
-            </Link>
-
             <Link to="/nominations" className="button button--gold button--sm header__cta">
               <Vote size={16} aria-hidden="true" />
               Голосовать
@@ -187,22 +171,6 @@ export function Header() {
                 ))}
               </nav>
               <div className="mobile-menu__foot">
-                <Link
-                  to="/my-votes"
-                  className="mobile-menu__progress"
-                  onClick={() => setMenuOpen(false)}
-                >
-                  <ProgressRing value={votedCount} total={categories.length} size={48} stroke={5}>
-                    <strong>{votedCount}</strong>
-                  </ProgressRing>
-                  <span>
-                    <strong>Мой голос</strong>
-                    <span>
-                      {votedCount} из {categories.length} номинаций
-                    </span>
-                  </span>
-                  <ArrowUpRight size={18} aria-hidden="true" />
-                </Link>
                 <Link
                   to="/nominations"
                   className="button button--gold mobile-menu__cta"

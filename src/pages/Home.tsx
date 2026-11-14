@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react'
 import { Link } from 'react-router-dom'
 import {
   ArrowDown,
@@ -9,14 +10,13 @@ import {
   Sparkles,
   Trophy,
 } from 'lucide-react'
-import { categories, totalNominees } from '../data/categories'
+import { categories } from '../data/categories'
 import { EVENT } from '../data/event'
 import { useVotes } from '../context/VotesContext'
 import { usePageTitle } from '../hooks/usePageTitle'
 import { CategoryRow } from '../components/CategoryRow'
 import { Countdown } from '../components/Countdown'
 import { Reveal } from '../components/Reveal'
-import { pluralize } from '../lib/format'
 
 const featuredIds = [
   'king-itd',
@@ -25,6 +25,12 @@ const featuredIds = [
   'meme-goda',
   'track-goda',
   'event-goda',
+]
+
+const wordmarkLines = [
+  { text: 'ITD', modifier: 'itd' },
+  { text: 'AWARDS', modifier: 'awards' },
+  { text: '2026', modifier: 'year' },
 ]
 
 const steps = [
@@ -43,7 +49,7 @@ const steps = [
   {
     icon: Trophy,
     title: 'Дождись',
-    text: 'Мы объявим первых победителей на церемонии 27 декабря. Ваш голос уже будет учтён.',
+    text: `Мы объявим первых победителей ${EVENT.winnersLabel}. Ваш голос уже будет учтён.`,
     tag: '27 декабря',
   },
 ]
@@ -81,18 +87,29 @@ export function Home() {
             </p>
 
             <h1 className="hero-wordmark" aria-label="ITD AWARDS 2026">
-              <span className="hero-wordmark__line hero-wordmark__line--itd" aria-hidden="true">
-                ITD
-              </span>
-              <span
-                className="hero-wordmark__line hero-wordmark__line--awards"
-                aria-hidden="true"
-              >
-                AWARDS
-              </span>
-              <span className="hero-wordmark__line hero-wordmark__line--year" aria-hidden="true">
-                2026
-              </span>
+              {wordmarkLines.map((line, lineIndex) => {
+                const offset = wordmarkLines
+                  .slice(0, lineIndex)
+                  .reduce((total, item) => total + item.text.length, 0)
+
+                return (
+                  <span
+                    className={`hero-wordmark__line hero-wordmark__line--${line.modifier}`}
+                    aria-hidden="true"
+                    key={line.text}
+                  >
+                    {[...line.text].map((letter, letterIndex) => (
+                      <span
+                        className="hero-wordmark__letter"
+                        style={{ '--letter': offset + letterIndex } as CSSProperties}
+                        key={`${letter}-${letterIndex}`}
+                      >
+                        {letter}
+                      </span>
+                    ))}
+                  </span>
+                )
+              })}
             </h1>
 
             <p className="hero__lead">
@@ -104,8 +121,8 @@ export function Home() {
                 {votedCount > 0 ? 'Продолжить голосование' : 'Отдать голос'}
                 <ArrowUpRight size={18} aria-hidden="true" />
               </Link>
-              <Link to="/results" className="button button--ghost button--lg">
-                Смотреть результаты
+              <Link to="/about" className="button button--ghost button--lg">
+                Как это работает
               </Link>
             </div>
 
@@ -123,7 +140,6 @@ export function Home() {
 
           <div className="hero__bottom">
             <span>{categories.length} номинаций</span>
-            <span className="hero__bottom-center">Церемония · {EVENT.ceremonyLabel}</span>
             <a href="#nominations">
               Выбрать победителей
               <ArrowDown size={14} aria-hidden="true" />
@@ -165,10 +181,6 @@ export function Home() {
                 <span>номинаций</span>
               </div>
               <div className="stat">
-                <strong>{totalNominees}</strong>
-                <span>{pluralize(totalNominees, 'номинант', 'номинанта', 'номинантов')}</span>
-              </div>
-              <div className="stat">
                 <strong>01</strong>
                 <span>голос в каждой номинации</span>
               </div>
@@ -189,12 +201,6 @@ export function Home() {
               <h2 className="display">Выбери своих</h2>
             </div>
             <div className="section-head__side">
-              {votedCount > 0 && (
-                <span className="progress-note">
-                  <CheckCircle2 size={15} aria-hidden="true" />
-                  {votedCount} из {categories.length} уже выбрано
-                </span>
-              )}
               <Link to="/nominations" className="link-inline">
                 Все {categories.length} номинаций
                 <ArrowUpRight size={15} aria-hidden="true" />
@@ -209,16 +215,6 @@ export function Home() {
               ))}
             </div>
           </Reveal>
-
-          <div className="categories-footer">
-            <p>
-              {votesRemainingMessage(votedCount, categories.length)}
-            </p>
-            <Link to="/nominations" className="button button--cream">
-              Открыть все номинации
-              <ArrowRight size={17} aria-hidden="true" />
-            </Link>
-          </div>
         </div>
       </section>
 
@@ -300,7 +296,7 @@ export function Home() {
             </h2>
             <p className="final-cta__copy">
               Голосование открыто до {EVENT.votingEndLabel}. Выбери победителей в
-              каждой номинации и забери с собой немного общего праздника.
+              каждой номинации — итоги объявим {EVENT.winnersLabel}.
             </p>
             <div className="final-cta__actions">
               <Link to="/nominations" className="button button--dark button--lg">
@@ -320,10 +316,4 @@ export function Home() {
       </section>
     </div>
   )
-}
-
-function votesRemainingMessage(votedCount: number, total: number): string {
-  if (votedCount === 0) return 'Начните с любой номинации — прогресс сохранится автоматически.'
-  if (votedCount === total) return 'Все голоса собраны. Теперь остаётся дождаться церемонии.'
-  return `Вы уже прошли ${votedCount} из ${total}. Продолжите, когда будет минутка.`
 }
