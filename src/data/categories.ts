@@ -7,6 +7,9 @@ export type Nominee = {
   tagline: string
   song?: string
   profile: string
+  photo?: string
+  photoAlt?: string
+  audio?: string
 }
 
 export type Category = {
@@ -23,6 +26,81 @@ export const groupLabels: Record<CategoryGroup, string> = {
   community: 'Сообщество',
 }
 
+const nomineePhotos: Record<string, { src: string; alt: string }> = {
+  'kot-admin': {
+    src: '/images/meme-kot-admin.svg',
+    alt: 'Серый кот в очках за рабочим столом с ноутбуком и тёплой лампой',
+  },
+  'nu-eto-baza': {
+    src: '/images/meme-nu-eto-baza.svg',
+    alt: 'Рука ставит тяжёлую печать на стопку документов в луче света',
+  },
+  'astral-exit': {
+    src: '/images/meme-astral-exit.svg',
+    alt: 'Силуэт человека в пальто уходит в светящийся фиолетовый портал',
+  },
+  slowbro: {
+    src: '/images/meme-slowbro.svg',
+    alt: 'Ленивец в наушниках лежит в гамаке в тёмной комнате',
+  },
+  'podcast-nn': {
+    src: '/images/project-podcast-nn.svg',
+    alt: 'Студия подкаста с двумя микрофонами и тёплым светом лампы',
+  },
+  'anonymous-art': {
+    src: '/images/project-anonymous-art.svg',
+    alt: 'Ночная художественная мастерская с мольбертами и холстами',
+  },
+  'itd-wiki': {
+    src: '/images/project-itd-wiki.svg',
+    alt: 'Архив с картотекой и светящимся экраном, человек у стола',
+  },
+  'svet-okne': {
+    src: '/images/project-svet-okne.svg',
+    alt: 'Тёмный фасад дома с одним тёплым светящимся окном',
+  },
+  'neon-import': {
+    src: '/images/zavoz-neon-import.svg',
+    alt: 'Фургон с открытыми дверями и неоновым светом на ночной улице',
+  },
+  'box-treasure': {
+    src: '/images/zavoz-box-treasure.svg',
+    alt: 'Открытый деревянный ящик со светящимися сокровищами',
+  },
+  'market-detected': {
+    src: '/images/zavoz-market-detected.svg',
+    alt: 'Ночной маркет с редкими вещами и человеком с фонарём',
+  },
+  'vibe-2007': {
+    src: '/images/zavoz-vibe-2007.svg',
+    alt: 'Комната с ЭЛТ-монитором, наушниками и закатным светом',
+  },
+  'itd-night': {
+    src: '/images/event-itd-night.svg',
+    alt: 'Ночная вечеринка на крыше под гирляндами с танцующими силуэтами',
+  },
+  'pixel-fest': {
+    src: '/images/event-pixel-fest.svg',
+    alt: 'Фестиваль аркадных автоматов с неоновой подсветкой',
+  },
+  'quiet-party': {
+    src: '/images/event-quiet-party.svg',
+    alt: 'Тихая вечеринка в уютной комнате с тёплым светом',
+  },
+  'art-sea': {
+    src: '/images/event-art-sea.svg',
+    alt: 'Арт-маркет у моря на закате с палатками и картинами',
+  },
+}
+
+const nomineeAudio: Record<string, string> = {
+  'northern-noise': '/audio/northern-noise.wav',
+  'dust-vhs': '/audio/dust-vhs.wav',
+  'dont-let-go': '/audio/dont-let-go.wav',
+  'silence-online': '/audio/silence-online.wav',
+  slowly: '/audio/slowly.wav',
+}
+
 function nominee(
   id: string,
   name: string,
@@ -31,6 +109,7 @@ function nominee(
   song?: string,
   profile?: string,
 ): Nominee {
+  const photo = nomineePhotos[id]
   return {
     id,
     name,
@@ -38,6 +117,9 @@ function nominee(
     tagline,
     song,
     profile: profile ?? `https://t.me/${handle.replace(/^[@#]/, '')}`,
+    photo: photo?.src,
+    photoAlt: photo?.alt,
+    audio: nomineeAudio[id],
   }
 }
 

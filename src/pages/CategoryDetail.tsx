@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import type { CSSProperties, RefObject } from 'react'
+import type { RefObject } from 'react'
 import {
   ArrowLeft,
   ArrowRight,
@@ -10,6 +10,7 @@ import {
   Clock3,
   Info,
   Lock,
+  Maximize2,
   Music2,
   Pencil,
   Share2,
@@ -21,8 +22,13 @@ import { EVENT } from '../data/event'
 import { useVotes } from '../context/VotesContext'
 import { useToast } from '../context/ToastContext'
 import { usePageTitle } from '../hooks/usePageTitle'
-import { makeInitials, makeTone } from '../lib/format'
+import { makeInitials } from '../lib/format'
 import { CategoryIcon } from '../components/CategoryIcon'
+import { NomineeArtwork } from '../components/NomineeArtwork'
+import { getNomineeVisual } from '../lib/nomineeVisual'
+import { PhotoLightbox } from '../components/PhotoLightbox'
+import type { LightboxPhoto } from '../components/PhotoLightbox'
+import { TrackPlayer } from '../components/TrackPlayer'
 import { NotFound } from './NotFound'
 
 export function CategoryDetail() {
@@ -35,6 +41,14 @@ export function CategoryDetail() {
   return <CategoryView category={category} key={category.id} />
 }
 
+const categoryKickers: Record<string, string> = {
+  'meme-goda': 'Мем',
+  'project-goda': 'Проект',
+  'zavoz-goda': 'Завоз',
+  'event-goda': 'Событие',
+  'track-goda': 'Трек',
+}
+
 function CategoryView({ category }: { category: Category }) {
   const { votes, saveVote } = useVotes()
   const { showToast } = useToast()
@@ -42,6 +56,7 @@ function CategoryView({ category }: { category: Category }) {
   const [draft, setDraft] = useState<string[]>(savedPicks)
   const [editing, setEditing] = useState(savedPicks.length === 0)
   const [error, setError] = useState('')
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null)
   const firstNomineeRef = useRef<HTMLButtonElement>(null)
 
   const currentIndex = categories.findIndex((categoryItem) => categoryItem.id === category.id)
@@ -51,6 +66,25 @@ function CategoryView({ category }: { category: Category }) {
     draft.includes(nomineeItem.id),
   )
   const saved = savedPicks.length > 0
+  const photoNominees = category.nominees.filter((nomineeItem) => nomineeItem.photo)
+  const lightboxPhotos: LightboxPhoto[] = photoNominees.map((nomineeItem) => ({
+    src: nomineeItem.photo ?? '',
+    alt: nomineeItem.photoAlt ?? nomineeItem.name,
+    name: nomineeItem.name,
+    category: category.title,
+  }))
+  const kicker = categoryKickers[category.id] ?? 'Автор'
+  const listClassName =
+    photoNominees.length > 0
+      ? 'nominee-list nominee-list--gallery'
+      : category.id === 'track-goda'
+        ? 'nominee-list nominee-list--tracks'
+        : 'nominee-list'
+
+  const openPhoto = (nomineeId: string) => {
+    const index = photoNominees.findIndex((nomineeItem) => nomineeItem.id === nomineeId)
+    if (index >= 0) setLightboxIndex(index)
+  }
 
   const toggleNominee = (nomineeId: string) => {
     if (!editing) return
@@ -207,17 +241,21 @@ function CategoryView({ category }: { category: Category }) {
                 </div>
               </div>
 
-              <div className="nominee-list">
+              <div className={listClassName}>
                 {category.nominees.map((nomineeItem, index) => {
                   const isSelected = draft.includes(nomineeItem.id)
                   return (
                     <NomineeCard
                       key={nomineeItem.id}
                       nominee={nomineeItem}
+                      categoryId={category.id}
+                      groupLabel={groupLabels[category.group]}
+                      kicker={kicker}
                       selected={isSelected}
                       editing={editing}
                       index={index}
                       onToggle={() => toggleNominee(nomineeItem.id)}
+                      onOpenPhoto={() => openPhoto(nomineeItem.id)}
                       buttonRef={index === 0 ? firstNomineeRef : undefined}
                     />
                   )
@@ -332,36 +370,52 @@ function CategoryView({ category }: { category: Category }) {
           </nav>
         </div>
       </section>
+
+      {lightboxIndex !== null && (
+        <PhotoLightbox
+          photos={lightboxPhotos}
+          index={lightboxIndex}
+          onClose={() => setLightboxIndex(null)}
+          onNavigate={setLightboxIndex}
+        />
+      )}
     </div>
   )
 }
 
 type NomineeCardProps = {
   nominee: Nominee
+  categoryId: string
+  groupLabel: string
+  kicker: string
   selected: boolean
   editing: boolean
   index: number
   onToggle: () => void
+  onOpenPhoto: () => void
   buttonRef?: RefObject<HTMLButtonElement | null>
 }
 
 function NomineeCard({
   nominee,
+  categoryId,
+  groupLabel,
+  kicker,
   selected,
   editing,
   index,
   onToggle,
+  onOpenPhoto,
   buttonRef,
 }: NomineeCardProps) {
-  const tone = makeTone(nominee.id)
-  const avatarStyle = {
-    '--tone': tone,
-    '--shift': `${(index % 4) * 12}deg`,
-  } as CSSProperties
+  const visual = getNomineeVisual(categoryId, nominee)
+  const number = String(index + 1).padStart(2, '0')
 
   return (
     <article
-      className={`nominee ${selected ? 'is-selected' : ''} ${editing ? '' : 'is-locked'}`}
+      className={`nominee nominee--${visual} ${selected ? 'is-selected' : ''} ${
+        editing ? '' : 'is-locked'
+      }`}
     >
       <button
         ref={buttonRef}
@@ -372,12 +426,52 @@ function NomineeCard({
         disabled={!editing}
         onClick={onToggle}
       />
-      <span className="nominee__avatar" style={avatarStyle} aria-hidden="true">
-        <span className="nominee__initials">{makeInitials(nominee.name)}</span>
-      </span>
-      <span className="nominee__body">
-        <span className="nominee__top">
-          <span className="nominee__name">{nominee.name}</span>
+
+      {visual === 'photo' ? (
+        <div className="nominee__photo-wrap">
+          <button
+            type="button"
+            className="nominee__photo"
+            onClick={onOpenPhoto}
+            aria-label={`Открыть фото крупнее: ${nominee.photoAlt ?? nominee.name}`}
+          >
+            <NomineeArtwork
+              nominee={nominee}
+              categoryId={categoryId}
+              className="nominee__photo-img"
+            />
+            <span className="nominee__zoom" aria-hidden="true">
+              <Maximize2 size={13} />
+              Увеличить
+            </span>
+          </button>
+          <span className="nominee__number" aria-hidden="true">
+            {number}
+          </span>
+        </div>
+      ) : (
+        <span className="nominee__art" aria-hidden="true">
+          <NomineeArtwork nominee={nominee} categoryId={categoryId} />
+          <span className="nominee__number">{number}</span>
+        </span>
+      )}
+
+      {visual === 'portrait' && (
+        <span className="nominee__watermark" aria-hidden="true">
+          {makeInitials(nominee.name)}
+        </span>
+      )}
+
+      <div className="nominee__body">
+        <span className="nominee__kicker">
+          {kicker}
+          <span className="nominee__kicker-sep" aria-hidden="true">
+            /
+          </span>
+          {groupLabel}
+        </span>
+        <div className="nominee__top">
+          <h3 className="nominee__name">{nominee.name}</h3>
           <a
             className="nominee__profile"
             href={nominee.profile}
@@ -388,15 +482,17 @@ function NomineeCard({
             {nominee.handle}
             <ArrowUpRight size={10} aria-hidden="true" />
           </a>
-        </span>
-        <span className="nominee__tagline">{nominee.tagline}</span>
+        </div>
+        <p className="nominee__tagline">{nominee.tagline}</p>
         {nominee.song && (
           <span className="nominee__song">
             <Music2 size={11} aria-hidden="true" />
             Песня: {nominee.song}
           </span>
         )}
-      </span>
+        {nominee.audio && <TrackPlayer src={nominee.audio} title={nominee.name} />}
+      </div>
+
       <span className="nominee__control" aria-hidden="true">
         {selected && <Check size={15} strokeWidth={3} />}
       </span>

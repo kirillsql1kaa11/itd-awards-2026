@@ -18,11 +18,3 @@ export function makeInitials(name: string): string {
   const second = words[1]?.[0] ?? ''
   return `${first}${second}`.toUpperCase()
 }
-
-export function makeTone(seed: string): number {
-  let hash = 0
-  for (let index = 0; index < seed.length; index += 1) {
-    hash = (hash * 31 + seed.charCodeAt(index)) % 360
-  }
-  return 58 + (hash % 78)
-}

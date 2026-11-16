@@ -11,6 +11,7 @@ import {
 } from 'lucide-react'
 import { PageHero } from '../components/PageHero'
 import { CategoryIcon } from '../components/CategoryIcon'
+import { NomineeArtwork } from '../components/NomineeArtwork'
 import { categories, groupLabels } from '../data/categories'
 import { EVENT } from '../data/event'
 import { useVotes } from '../context/VotesContext'
@@ -93,6 +94,12 @@ export function MyVotes() {
                       <ul className="vote-card__picks">
                         {picks.map((nomineeItem) => (
                           <li key={nomineeItem.id}>
+                            <span className="vote-card__pick-art" aria-hidden="true">
+                              <NomineeArtwork
+                                nominee={nomineeItem}
+                                categoryId={categoryItem.id}
+                              />
+                            </span>
                             <span className="vote-card__pick-check" aria-hidden="true">
                               <Check size={11} strokeWidth={3} />
                             </span>
