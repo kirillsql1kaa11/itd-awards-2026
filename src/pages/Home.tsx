@@ -4,11 +4,12 @@ import {
   ArrowDown,
   ArrowRight,
   ArrowUpRight,
-  CheckCircle2,
+  CalendarDays,
   Clock3,
-  MousePointerClick,
+  ListChecks,
   Sparkles,
   Trophy,
+  Vote,
 } from 'lucide-react'
 import { categories } from '../data/categories'
 import { EVENT } from '../data/event'
@@ -35,22 +36,25 @@ const wordmarkLines = [
 
 const steps = [
   {
-    icon: MousePointerClick,
-    title: 'Выбери',
-    text: 'Открой номинацию и отметь одного номинанта, который запомнился в этом году.',
-    tag: '17 категорий',
+    icon: ListChecks,
+    date: 'до 13 ноября',
+    title: 'Номинанты собраны',
+    text: 'Сообщество предложило людей, проекты, мемы и события. Первый этап завершён — список сезона зафиксирован.',
+    tag: 'Этап I · завершён',
   },
   {
-    icon: CheckCircle2,
-    title: 'Сохрани',
-    text: 'В каждой номинации — один голос. Выбор можно изменить до 20 декабря.',
-    tag: 'один голос',
+    icon: Vote,
+    date: '14 ноября — 20 декабря',
+    title: 'Выбери своих',
+    text: 'В каждой из 17 номинаций — один голос. Выбор можно изменить до конца голосования.',
+    tag: 'Этап II · сейчас',
   },
   {
     icon: Trophy,
-    title: 'Дождись',
-    text: `Мы объявим первых победителей ${EVENT.winnersLabel}. Ваш голос уже будет учтён.`,
-    tag: '27 декабря',
+    date: '27 декабря',
+    title: 'Дождись золота',
+    text: `Объявим первых победителей ${EVENT.winnersLabel}. Ваш голос уже будет учтён.`,
+    tag: 'Этап III · финал',
   },
 ]
 
@@ -121,9 +125,9 @@ export function Home() {
                 {votedCount > 0 ? 'Продолжить голосование' : 'Отдать голос'}
                 <ArrowUpRight size={18} aria-hidden="true" />
               </Link>
-              <Link to="/about" className="button button--ghost button--lg">
+              <a href="#how" className="button button--ghost button--lg">
                 Как это работает
-              </Link>
+              </a>
             </div>
 
             <div className="hero__deadline">
@@ -162,7 +166,7 @@ export function Home() {
       <section className="section intro">
         <div className="container intro__grid">
           <Reveal>
-            <p className="eyebrow">О премии</p>
+            <p className="eyebrow">Первый сезон</p>
             <h2 className="display display--lg">
               Не просто премия.
               <br />
@@ -185,8 +189,8 @@ export function Home() {
                 <span>голос в каждой номинации</span>
               </div>
             </div>
-            <Link to="/about" className="link-inline">
-              Как устроена премия
+            <Link to="/questions" className="link-inline">
+              Частые вопросы
               <ArrowRight size={15} aria-hidden="true" />
             </Link>
           </Reveal>
@@ -218,18 +222,19 @@ export function Home() {
         </div>
       </section>
 
-      <section className="section how">
+      <section className="section how" id="how">
         <div className="container">
           <div className="section-head">
             <div>
-              <p className="eyebrow">Всё просто</p>
+              <p className="eyebrow">Календарь сезона</p>
               <h2 className="display">Три шага до золота</h2>
             </div>
             <p className="section-head__note">
-              Без регистрации и сложных форм. Голос сохраняется в вашем браузере.
+              <CalendarDays size={14} aria-hidden="true" />
+              От предложений сообщества до первых имён. Без регистрации и сложных форм.
             </p>
           </div>
-          <div className="steps">
+          <div className="steps steps--calendar">
             {steps.map((step, index) => {
               const Icon = step.icon
               return (
@@ -237,6 +242,10 @@ export function Home() {
                   <article className="step">
                     <span className="step__number" aria-hidden="true">
                       0{index + 1}
+                    </span>
+                    <span className="step__date">
+                      <CalendarDays size={12} aria-hidden="true" />
+                      {step.date}
                     </span>
                     <span className="step__icon" aria-hidden="true">
                       <Icon size={22} strokeWidth={1.7} />
@@ -259,7 +268,7 @@ export function Home() {
               <div className="stage-banner__copy">
                 <p className="eyebrow eyebrow--dark">Этап II · Голосование</p>
                 <h2>
-                  Номинанты собраны. <em>Слово за вами.</em>
+                  Номинанты собраны. <em>Вопросы?</em>
                 </h2>
                 <p>
                   Первый этап завершился 13 ноября: сообщество предложило номинантов и
@@ -303,8 +312,8 @@ export function Home() {
                 {votedCount > 0 ? 'Продолжить голосование' : 'Отдать голос'}
                 <ArrowUpRight size={18} aria-hidden="true" />
               </Link>
-              <Link to="/about" className="final-cta__link">
-                Правила голосования
+              <Link to="/questions" className="final-cta__link">
+                Вопросы и ответы
                 <ArrowRight size={15} aria-hidden="true" />
               </Link>
             </div>

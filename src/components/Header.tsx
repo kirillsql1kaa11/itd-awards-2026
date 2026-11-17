@@ -7,7 +7,7 @@ import { Logo } from './Logo'
 const navItems = [
   { to: '/nominations', label: 'Номинации' },
   { to: '/my-votes', label: 'Мой голос' },
-  { to: '/about', label: 'О премии' },
+  { to: '/questions', label: 'Вопросы' },
 ]
 
 export function Header() {
@@ -77,8 +77,8 @@ export function Header() {
           </span>
           <span className="status-bar__details">
             <span className="status-bar__date">до {EVENT.votingEndLabel}</span>
-            <Link to="/about" className="status-bar__link">
-              Правила
+            <Link to="/questions" className="status-bar__link">
+              Вопросы
               <ArrowUpRight size={12} aria-hidden="true" />
             </Link>
           </span>
@@ -150,7 +150,7 @@ export function Header() {
                 </button>
               </div>
               <h2 className="sr-only" id="mobile-menu-title">
-                Навигация по премии
+                Навигация по сайту
               </h2>
               <nav className="mobile-menu__nav" aria-label="Мобильная навигация">
                 {navItems.map((item, index) => (

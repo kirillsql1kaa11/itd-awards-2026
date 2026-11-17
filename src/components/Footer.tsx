@@ -25,11 +25,11 @@ export function Footer() {
             <Link to="/my-votes">Мой голос</Link>
           </nav>
 
-          <nav className="footer__col" aria-label="Информация о премии">
-            <h2>Премия</h2>
-            <Link to="/about">О проекте</Link>
-            <Link to="/about#rules">Правила</Link>
-            <Link to="/about#faq">FAQ</Link>
+          <nav className="footer__col" aria-label="Помощь">
+            <h2>Помощь</h2>
+            <Link to="/questions">Вопросы</Link>
+            <Link to="/questions#faq">Частые вопросы</Link>
+            <Link to="/questions#contacts">Контакты</Link>
           </nav>
 
           <div className="footer__col">

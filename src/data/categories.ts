@@ -6,7 +6,6 @@ export type Nominee = {
   handle: string
   tagline: string
   song?: string
-  profile: string
   photo?: string
   photoAlt?: string
   audio?: string
@@ -107,7 +106,6 @@ function nominee(
   handle: string,
   tagline: string,
   song?: string,
-  profile?: string,
 ): Nominee {
   const photo = nomineePhotos[id]
   return {
@@ -116,7 +114,6 @@ function nominee(
     handle,
     tagline,
     song,
-    profile: profile ?? `https://t.me/${handle.replace(/^[@#]/, '')}`,
     photo: photo?.src,
     photoAlt: photo?.alt,
     audio: nomineeAudio[id],
@@ -164,10 +161,10 @@ export const categories: Category[] = [
     'community',
     'Самая громкая пара года — по версии сообщества. Любовь, дружба и немного драмы.',
     [
-      nominee('liza-artem', 'Лиза × Артём', '#тихийшторм', 'Самый тихий роман, который заметили все.', undefined, 'https://t.me/tihiy_shtorm'),
-      nominee('kira-max', 'Кира × Макс', '#неонlove', 'Неон, музыка и скриншоты на четыре тысячи реакций.', undefined, 'https://t.me/neonlove'),
-      nominee('asya-yan', 'Ася × Ян', '#двекометы', 'Две орбиты, которые наконец пересеклись.', undefined, 'https://t.me/dvekomety'),
-      nominee('nastya-grisha', 'Настя × Гриша', '#пополам', 'Делили всё пополам — даже внимание сообщества.', undefined, 'https://t.me/popolam'),
+      nominee('liza-artem', 'Лиза × Артём', '#тихийшторм', 'Самый тихий роман, который заметили все.'),
+      nominee('kira-max', 'Кира × Макс', '#неонlove', 'Неон, музыка и скриншоты на четыре тысячи реакций.'),
+      nominee('asya-yan', 'Ася × Ян', '#двекометы', 'Две орбиты, которые наконец пересеклись.'),
+      nominee('nastya-grisha', 'Настя × Гриша', '#пополам', 'Делили всё пополам — даже внимание сообщества.'),
     ],
   ),
   category(

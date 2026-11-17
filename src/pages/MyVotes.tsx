@@ -5,6 +5,7 @@ import {
   ArrowRight,
   ArrowUpRight,
   Check,
+  ImageDown,
   Pencil,
   RotateCcw,
   Vote,
@@ -13,19 +14,60 @@ import { PageHero } from '../components/PageHero'
 import { CategoryIcon } from '../components/CategoryIcon'
 import { NomineeArtwork } from '../components/NomineeArtwork'
 import { categories, groupLabels } from '../data/categories'
-import { EVENT } from '../data/event'
 import { useVotes } from '../context/VotesContext'
 import { useToast } from '../context/ToastContext'
 import { usePageTitle } from '../hooks/usePageTitle'
+import { createVotesPoster } from '../lib/votesPoster'
 
 export function MyVotes() {
   usePageTitle('Мой голос')
   const { votes, resetVotes } = useVotes()
   const { showToast } = useToast()
   const [confirmOpen, setConfirmOpen] = useState(false)
+  const [copying, setCopying] = useState(false)
   const cancelButtonRef = useRef<HTMLButtonElement>(null)
 
   const savedCategories = categories.filter((categoryItem) => votes[categoryItem.id])
+
+  const downloadPoster = (blob: Blob) => {
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = 'itd-awards-2026-moy-golos.png'
+    document.body.appendChild(link)
+    link.click()
+    link.remove()
+    window.setTimeout(() => URL.revokeObjectURL(url), 1000)
+  }
+
+  const copyPoster = async () => {
+    if (savedCategories.length === 0 || copying) return
+    setCopying(true)
+
+    try {
+      const blob = await createVotesPoster(votes)
+      const canCopyImage =
+        typeof ClipboardItem !== 'undefined' &&
+        Boolean(navigator.clipboard?.write)
+
+      if (canCopyImage) {
+        try {
+          await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })])
+          showToast('Картинка с голосами скопирована. Можно вставлять в пост.')
+        } catch {
+          downloadPoster(blob)
+          showToast('PNG с голосами скачан — прикрепите его к посту.', 'info')
+        }
+      } else {
+        downloadPoster(blob)
+        showToast('PNG с голосами скачан — прикрепите его к посту.', 'info')
+      }
+    } catch {
+      showToast('Не удалось собрать картинку. Попробуйте ещё раз.', 'error')
+    } finally {
+      setCopying(false)
+    }
+  }
 
   const requestReset = () => {
     setConfirmOpen(true)
@@ -61,8 +103,17 @@ export function MyVotes() {
                   <h2 className="display">Уже в списке</h2>
                 </div>
                 <div className="my-votes-head__side">
+                  <button
+                    type="button"
+                    className="button button--gold button--sm"
+                    onClick={copyPoster}
+                    disabled={copying}
+                  >
+                    <ImageDown size={15} aria-hidden="true" />
+                    {copying ? 'Собираю картинку…' : 'Скопировать картинкой'}
+                  </button>
                   <span className="my-votes-head__deadline">
-                    Изменить можно до {EVENT.votingEndLabel}
+                    Все {categories.length} номинаций — в одном PNG для поста
                   </span>
                 </div>
               </div>
@@ -124,7 +175,7 @@ export function MyVotes() {
               </div>
 
               <div className="my-votes-actions">
-                <Link to="/nominations" className="button button--gold">
+                <Link to="/nominations" className="button button--ghost">
                   Продолжить голосование
                   <ArrowRight size={17} aria-hidden="true" />
                 </Link>
@@ -150,7 +201,7 @@ export function MyVotes() {
                   Выбрать номинантов
                   <ArrowUpRight size={17} aria-hidden="true" />
                 </Link>
-                <Link to="/about" className="button button--ghost">
+                <Link to="/questions" className="button button--ghost">
                   Как это работает
                 </Link>
               </div>
@@ -195,7 +246,7 @@ export function MyVotes() {
               Голоса хранятся локально в вашем браузере. Это демо-проект без сервера:
               данные никуда не отправляются и не привязаны к аккаунту.
             </p>
-            <Link to="/about#faq" className="link-inline">
+            <Link to="/questions#faq" className="link-inline">
               Вопросы и ответы
               <ArrowUpRight size={14} aria-hidden="true" />
             </Link>

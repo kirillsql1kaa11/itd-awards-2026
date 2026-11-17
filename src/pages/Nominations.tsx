@@ -150,7 +150,7 @@ export function Nominations() {
                 </p>
               </div>
             </div>
-            <Link to="/about" className="link-inline">
+            <Link to="/questions" className="link-inline">
               Как это работает
               <ArrowRight size={15} aria-hidden="true" />
             </Link>

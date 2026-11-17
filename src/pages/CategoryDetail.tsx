@@ -9,7 +9,6 @@ import {
   CheckCircle2,
   Clock3,
   Info,
-  Lock,
   Maximize2,
   Music2,
   Pencil,
@@ -22,7 +21,7 @@ import { EVENT } from '../data/event'
 import { useVotes } from '../context/VotesContext'
 import { useToast } from '../context/ToastContext'
 import { usePageTitle } from '../hooks/usePageTitle'
-import { makeInitials } from '../lib/format'
+import { ITD_CHANNEL_URL } from '../data/contacts'
 import { CategoryIcon } from '../components/CategoryIcon'
 import { NomineeArtwork } from '../components/NomineeArtwork'
 import { getNomineeVisual } from '../lib/nomineeVisual'
@@ -30,6 +29,17 @@ import { PhotoLightbox } from '../components/PhotoLightbox'
 import type { LightboxPhoto } from '../components/PhotoLightbox'
 import { TrackPlayer } from '../components/TrackPlayer'
 import { NotFound } from './NotFound'
+
+function shuffleNominees(nominees: Nominee[]): Nominee[] {
+  const result = [...nominees]
+  for (let index = result.length - 1; index > 0; index -= 1) {
+    const swapIndex = Math.floor(Math.random() * (index + 1))
+    const current = result[index]
+    result[index] = result[swapIndex]
+    result[swapIndex] = current
+  }
+  return result
+}
 
 export function CategoryDetail() {
   const { categoryId } = useParams()
@@ -58,15 +68,18 @@ function CategoryView({ category }: { category: Category }) {
   const [error, setError] = useState('')
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null)
   const firstNomineeRef = useRef<HTMLButtonElement>(null)
+  const [orderedNominees] = useState(() =>
+    category.id === 'track-goda' ? shuffleNominees(category.nominees) : category.nominees,
+  )
 
   const currentIndex = categories.findIndex((categoryItem) => categoryItem.id === category.id)
   const previousCategory = categories[(currentIndex - 1 + categories.length) % categories.length]
   const nextCategory = categories[(currentIndex + 1) % categories.length]
-  const selectedNominees = category.nominees.filter((nomineeItem) =>
+  const selectedNominees = orderedNominees.filter((nomineeItem) =>
     draft.includes(nomineeItem.id),
   )
   const saved = savedPicks.length > 0
-  const photoNominees = category.nominees.filter((nomineeItem) => nomineeItem.photo)
+  const photoNominees = orderedNominees.filter((nomineeItem) => nomineeItem.photo)
   const lightboxPhotos: LightboxPhoto[] = photoNominees.map((nomineeItem) => ({
     src: nomineeItem.photo ?? '',
     alt: nomineeItem.photoAlt ?? nomineeItem.name,
@@ -74,12 +87,6 @@ function CategoryView({ category }: { category: Category }) {
     category: category.title,
   }))
   const kicker = categoryKickers[category.id] ?? 'Автор'
-  const listClassName =
-    photoNominees.length > 0
-      ? 'nominee-list nominee-list--gallery'
-      : category.id === 'track-goda'
-        ? 'nominee-list nominee-list--tracks'
-        : 'nominee-list'
 
   const openPhoto = (nomineeId: string) => {
     const index = photoNominees.findIndex((nomineeItem) => nomineeItem.id === nomineeId)
@@ -102,7 +109,7 @@ function CategoryView({ category }: { category: Category }) {
     saveVote(category.id, draft)
     setEditing(false)
     setError('')
-    showToast('Голос сохранён. Спасибо, что выбираете своих.')
+    showToast('Голос учтён.')
   }
 
   const handleEdit = () => {
@@ -209,16 +216,6 @@ function CategoryView({ category }: { category: Category }) {
         <div className="container">
           <div className="vote-layout">
             <div className="nominees-column">
-              {saved && !editing && (
-                <div className="saved-strip" role="status">
-                  <CheckCircle2 size={18} aria-hidden="true" />
-                  <span>Ваш голос сохранён. Спасибо, что выбираете своих.</span>
-                  <button type="button" className="saved-strip__button" onClick={handleEdit}>
-                    <Pencil size={13} aria-hidden="true" />
-                    Изменить
-                  </button>
-                </div>
-              )}
               {saved && editing && (
                 <div className="saved-strip saved-strip--editing">
                   <Pencil size={17} aria-hidden="true" />
@@ -241,8 +238,8 @@ function CategoryView({ category }: { category: Category }) {
                 </div>
               </div>
 
-              <div className={listClassName}>
-                {category.nominees.map((nomineeItem, index) => {
+              <div className="nominee-list">
+                {orderedNominees.map((nomineeItem, index) => {
                   const isSelected = draft.includes(nomineeItem.id)
                   return (
                     <NomineeCard
@@ -325,14 +322,6 @@ function CategoryView({ category }: { category: Category }) {
                   <Pencil size={15} aria-hidden="true" />
                 </button>
               )}
-
-              <div className="vote-panel__note">
-                <Lock size={14} aria-hidden="true" />
-                <p>
-                  Демо-режим: голос хранится только в вашем браузере. Его можно изменить
-                  до {EVENT.votingEndLabel}.
-                </p>
-              </div>
             </aside>
           </div>
 
@@ -427,62 +416,60 @@ function NomineeCard({
         onClick={onToggle}
       />
 
-      {visual === 'photo' ? (
-        <div className="nominee__photo-wrap">
-          <button
-            type="button"
-            className="nominee__photo"
-            onClick={onOpenPhoto}
-            aria-label={`Открыть фото крупнее: ${nominee.photoAlt ?? nominee.name}`}
-          >
+      <div className="nominee__media">
+        {visual === 'photo' ? (
+          <>
             <NomineeArtwork
               nominee={nominee}
               categoryId={categoryId}
               className="nominee__photo-img"
             />
-            <span className="nominee__zoom" aria-hidden="true">
-              <Maximize2 size={13} />
+            <button
+              type="button"
+              className="nominee__zoom"
+              onClick={onOpenPhoto}
+              aria-label={`Открыть фото крупнее: ${nominee.photoAlt ?? nominee.name}`}
+            >
+              <Maximize2 size={13} aria-hidden="true" />
               Увеличить
+            </button>
+          </>
+        ) : (
+          <span className="nominee__art" aria-hidden="true">
+            <NomineeArtwork nominee={nominee} categoryId={categoryId} />
+          </span>
+        )}
+
+        <div className="nominee__overlay">
+          <span className="nominee__kicker">
+            {kicker}
+            <span className="nominee__kicker-sep" aria-hidden="true">
+              /
             </span>
-          </button>
-          <span className="nominee__number" aria-hidden="true">
-            {number}
+            {groupLabel}
           </span>
-        </div>
-      ) : (
-        <span className="nominee__art" aria-hidden="true">
-          <NomineeArtwork nominee={nominee} categoryId={categoryId} />
-          <span className="nominee__number">{number}</span>
-        </span>
-      )}
-
-      {visual === 'portrait' && (
-        <span className="nominee__watermark" aria-hidden="true">
-          {makeInitials(nominee.name)}
-        </span>
-      )}
-
-      <div className="nominee__body">
-        <span className="nominee__kicker">
-          {kicker}
-          <span className="nominee__kicker-sep" aria-hidden="true">
-            /
-          </span>
-          {groupLabel}
-        </span>
-        <div className="nominee__top">
           <h3 className="nominee__name">{nominee.name}</h3>
           <a
             className="nominee__profile"
-            href={nominee.profile}
+            href={ITD_CHANNEL_URL}
             target="_blank"
             rel="noreferrer"
-            aria-label={`Профиль ${nominee.name} в Telegram`}
+            aria-label={`Канал ИТД ИТП в Telegram`}
           >
             {nominee.handle}
             <ArrowUpRight size={10} aria-hidden="true" />
           </a>
         </div>
+
+        <span className="nominee__number" aria-hidden="true">
+          {number}
+        </span>
+        <span className="nominee__control" aria-hidden="true">
+          {selected && <Check size={15} strokeWidth={3} />}
+        </span>
+      </div>
+
+      <div className="nominee__body">
         <p className="nominee__tagline">{nominee.tagline}</p>
         {nominee.song && (
           <span className="nominee__song">
@@ -492,10 +479,6 @@ function NomineeCard({
         )}
         {nominee.audio && <TrackPlayer src={nominee.audio} title={nominee.name} />}
       </div>
-
-      <span className="nominee__control" aria-hidden="true">
-        {selected && <Check size={15} strokeWidth={3} />}
-      </span>
     </article>
   )
 }
