@@ -30,6 +30,10 @@ const nomineePhotos: Record<string, { src: string; alt: string }> = {
     src: '/images/nominee-itdking.png',
     alt: 'Портрет ктсупер[113] в чёрном костюме с золотой вышивкой в круглой золотой раме',
   },
+  zyska: {
+    src: '/images/nominee-queen-zyska.png',
+    alt: 'Портрет Зыски с рыжими волосами в чёрном платье с золотой вышивкой в круглой раме',
+  },
   'kot-admin': {
     src: '/images/meme-kot-admin.svg',
     alt: 'Серый кот в очках за рабочим столом с ноутбуком и тёплой лампой',
@@ -154,6 +158,7 @@ export const categories: Category[] = [
     'people',
     'Голос, вкус и харизма, которые невозможно не заметить. В этом году королеву выбираете вы.',
     [
+      nominee('zyska', 'Зыска', '@zyska', 'Вкус, харизма и уверенность, которые задают тон.'),
       nominee('eva-mirage', 'Ева Мираж', '@eva_mirage', 'Умеет превратить обычный вечер в событие.'),
       nominee('sonya-velvet', 'Соня Вельвет', '@velvetsonya', 'Вкус, тексты и бархатный голос сообщества.'),
       nominee('nika-astra', 'Ника Астра', '@astra_nika', 'Харизма, после которой хочется остаться.'),
