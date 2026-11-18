@@ -1,4 +1,6 @@
 export const ITD_CHANNEL_URL = 'https://t.me/itditp'
+export const ITD_BOT_URL = 'https://t.me/itditp_bot'
+export const ITD_BOT_NAME = '@itditp_bot'
 
 export const telegramChannels = [
   { label: 'ИТД ИТП', shortLabel: 'ИТД ИТП', href: ITD_CHANNEL_URL },

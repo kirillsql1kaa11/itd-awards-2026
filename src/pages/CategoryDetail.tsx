@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useCallback, useRef, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import type { RefObject } from 'react'
 import {
@@ -13,6 +13,7 @@ import {
   Music2,
   Pencil,
   Share2,
+  Ticket,
   X,
 } from 'lucide-react'
 import type { Category, Nominee } from '../data/categories'
@@ -20,6 +21,7 @@ import { categories, getCategory, groupLabels } from '../data/categories'
 import { EVENT } from '../data/event'
 import { useVotes } from '../context/VotesContext'
 import { useToast } from '../context/ToastContext'
+import { useTicket } from '../context/TicketContext'
 import { usePageTitle } from '../hooks/usePageTitle'
 import { ITD_CHANNEL_URL } from '../data/contacts'
 import { CategoryIcon } from '../components/CategoryIcon'
@@ -27,6 +29,7 @@ import { NomineeArtwork } from '../components/NomineeArtwork'
 import { getNomineeVisual } from '../lib/nomineeVisual'
 import { PhotoLightbox } from '../components/PhotoLightbox'
 import type { LightboxPhoto } from '../components/PhotoLightbox'
+import { TicketModal } from '../components/TicketModal'
 import { TrackPlayer } from '../components/TrackPlayer'
 import { NotFound } from './NotFound'
 
@@ -61,13 +64,16 @@ const categoryKickers: Record<string, string> = {
 
 function CategoryView({ category }: { category: Category }) {
   const { votes, saveVote } = useVotes()
+  const { ticket, activateTicket } = useTicket()
   const { showToast } = useToast()
   const savedPicks = votes[category.id]?.picks ?? []
   const [draft, setDraft] = useState<string[]>(savedPicks)
   const [editing, setEditing] = useState(savedPicks.length === 0)
   const [error, setError] = useState('')
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null)
+  const [ticketOpen, setTicketOpen] = useState(false)
   const firstNomineeRef = useRef<HTMLButtonElement>(null)
+  const closeTicketModal = useCallback(() => setTicketOpen(false), [])
   const [orderedNominees] = useState(() =>
     category.id === 'track-goda' ? shuffleNominees(category.nominees) : category.nominees,
   )
@@ -106,10 +112,25 @@ function CategoryView({ category }: { category: Category }) {
       return
     }
 
+    if (!ticket) {
+      setError('')
+      setTicketOpen(true)
+      return
+    }
+
     saveVote(category.id, draft)
     setEditing(false)
     setError('')
-    showToast('Голос учтён.')
+    showToast(`Голос учтён. Билет ${ticket.number}.`)
+  }
+
+  const handleTicketActivated = (number: string) => {
+    const next = activateTicket(number)
+    setTicketOpen(false)
+    saveVote(category.id, draft)
+    setEditing(false)
+    setError('')
+    showToast(`Билет ${next.number} активирован. Голос учтён.`)
   }
 
   const handleEdit = () => {
@@ -269,6 +290,12 @@ function CategoryView({ category }: { category: Category }) {
             <aside className="vote-panel" aria-labelledby="vote-panel-title">
               <div className="vote-panel__head">
                 <p className="eyebrow">Ваш голос</p>
+                {ticket && (
+                  <span className="vote-panel__ticket">
+                    <Ticket size={12} aria-hidden="true" />
+                    {ticket.number}
+                  </span>
+                )}
               </div>
               <h2 id="vote-panel-title">
                 {saved && !editing ? 'Голос учтён' : 'Сделайте выбор'}
@@ -367,6 +394,10 @@ function CategoryView({ category }: { category: Category }) {
           onClose={() => setLightboxIndex(null)}
           onNavigate={setLightboxIndex}
         />
+      )}
+
+      {ticketOpen && (
+        <TicketModal onClose={closeTicketModal} onActivate={handleTicketActivated} />
       )}
     </div>
   )

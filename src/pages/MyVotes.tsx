@@ -5,9 +5,11 @@ import {
   ArrowRight,
   ArrowUpRight,
   Check,
+  Download,
   ImageDown,
   Pencil,
   RotateCcw,
+  Ticket,
   Vote,
 } from 'lucide-react'
 import { PageHero } from '../components/PageHero'
@@ -16,13 +18,17 @@ import { NomineeArtwork } from '../components/NomineeArtwork'
 import { categories, groupLabels } from '../data/categories'
 import { useVotes } from '../context/VotesContext'
 import { useToast } from '../context/ToastContext'
+import { useTicket } from '../context/TicketContext'
+import { useMediaQuery } from '../hooks/useMediaQuery'
 import { usePageTitle } from '../hooks/usePageTitle'
 import { createVotesPoster } from '../lib/votesPoster'
 
 export function MyVotes() {
   usePageTitle('Мой голос')
   const { votes, resetVotes } = useVotes()
+  const { ticket } = useTicket()
   const { showToast } = useToast()
+  const downloadOnly = useMediaQuery('(max-width: 720px)')
   const [confirmOpen, setConfirmOpen] = useState(false)
   const [copying, setCopying] = useState(false)
   const cancelButtonRef = useRef<HTMLButtonElement>(null)
@@ -46,6 +52,13 @@ export function MyVotes() {
 
     try {
       const blob = await createVotesPoster(votes)
+
+      if (downloadOnly) {
+        downloadPoster(blob)
+        showToast('PNG с голосами скачан — прикрепите его к посту.', 'info')
+        return
+      }
+
       const canCopyImage =
         typeof ClipboardItem !== 'undefined' &&
         Boolean(navigator.clipboard?.write)
@@ -101,6 +114,12 @@ export function MyVotes() {
                 <div>
                   <p className="eyebrow">Ваши выборы</p>
                   <h2 className="display">Уже в списке</h2>
+                  {ticket && (
+                    <span className="my-votes-ticket">
+                      <Ticket size={13} aria-hidden="true" />
+                      Билет {ticket.number}
+                    </span>
+                  )}
                 </div>
                 <div className="my-votes-head__side">
                   <button
@@ -109,8 +128,16 @@ export function MyVotes() {
                     onClick={copyPoster}
                     disabled={copying}
                   >
-                    <ImageDown size={15} aria-hidden="true" />
-                    {copying ? 'Собираю картинку…' : 'Скопировать картинкой'}
+                    {downloadOnly ? (
+                      <Download size={15} aria-hidden="true" />
+                    ) : (
+                      <ImageDown size={15} aria-hidden="true" />
+                    )}
+                    {copying
+                      ? 'Собираю картинку…'
+                      : downloadOnly
+                        ? 'Скачать картинку'
+                        : 'Скопировать картинкой'}
                   </button>
                   <span className="my-votes-head__deadline">
                     Все {categories.length} номинаций — в одном PNG для поста

@@ -2,7 +2,7 @@ import { categories } from '../data/categories'
 import { EVENT } from '../data/event'
 
 const WIDTH = 1080
-const HEIGHT = 1440
+const HEIGHT = 1350
 const MARGIN = 64
 
 const gold = '#cdb57c'
@@ -38,9 +38,9 @@ export async function createVotesPoster(votes: PosterVotes): Promise<Blob> {
     document.fonts.load('600 16px "Manrope"'),
     document.fonts.load('700 16px "Manrope"'),
     document.fonts.load('800 16px "Manrope"'),
-    document.fonts.load('600 72px "Cormorant Garamond"'),
-    document.fonts.load('500 italic 72px "Cormorant Garamond"'),
-    document.fonts.load('400 118px "Pirata One"'),
+    document.fonts.load('600 44px "Cormorant Garamond"'),
+    document.fonts.load('500 italic 44px "Cormorant Garamond"'),
+    document.fonts.load('400 92px "Pirata One"'),
   ]).catch(() => [])
 
   const canvas = document.createElement('canvas')
@@ -52,62 +52,53 @@ export async function createVotesPoster(votes: PosterVotes): Promise<Blob> {
   context.fillStyle = ink
   context.fillRect(0, 0, WIDTH, HEIGHT)
 
-  const glow = context.createRadialGradient(WIDTH * 0.5, 80, 20, WIDTH * 0.5, 80, 820)
+  const glow = context.createRadialGradient(WIDTH * 0.5, 30, 20, WIDTH * 0.5, 30, 780)
   glow.addColorStop(0, 'rgba(236, 217, 167, 0.2)')
   glow.addColorStop(0.45, 'rgba(205, 181, 124, 0.07)')
   glow.addColorStop(1, 'rgba(8, 8, 6, 0)')
   context.fillStyle = glow
-  context.fillRect(0, 0, WIDTH, 760)
-
-  const vignette = context.createLinearGradient(0, HEIGHT - 420, 0, HEIGHT)
-  vignette.addColorStop(0, 'rgba(8, 8, 6, 0)')
-  vignette.addColorStop(1, 'rgba(205, 181, 124, 0.08)')
-  context.fillStyle = vignette
-  context.fillRect(0, HEIGHT - 420, WIDTH, 420)
+  context.fillRect(0, 0, WIDTH, 720)
 
   context.strokeStyle = 'rgba(205, 181, 124, 0.34)'
   context.lineWidth = 1.5
   context.strokeRect(30, 30, WIDTH - 60, HEIGHT - 60)
 
   context.textBaseline = 'alphabetic'
-  context.font = '700 13px "Manrope"'
-  context.fillStyle = gold
-  context.fillText('ITD COMMUNITY AWARDS', MARGIN, 86)
+  context.font = '400 92px "Pirata One"'
+  context.fillStyle = goldBright
+  context.fillText('ITD AWARDS', MARGIN, 128)
 
   context.textAlign = 'right'
-  context.fillStyle = 'rgba(239, 231, 214, 0.46)'
-  context.fillText('ПЕРВЫЙ СЕЗОН · 2026', WIDTH - MARGIN, 86)
+  context.font = '400 64px "Pirata One"'
+  context.fillStyle = gold
+  context.fillText('2026', WIDTH - MARGIN, 128)
   context.textAlign = 'left'
 
+  drawRule(context, 166)
+
+  context.font = '600 44px "Cormorant Garamond"'
   context.fillStyle = cream
-  context.font = '600 76px "Cormorant Garamond"'
-  context.fillText('Мой', MARGIN, 190)
+  context.fillText('Мой', MARGIN, 220)
   const myWidth = context.measureText('Мой ').width
   context.fillStyle = goldBright
-  context.font = '500 italic 76px "Cormorant Garamond"'
-  context.fillText('голос', MARGIN + myWidth, 190)
+  context.font = '500 italic 44px "Cormorant Garamond"'
+  context.fillText('голос', MARGIN + myWidth, 220)
 
-  context.textAlign = 'right'
-  context.fillStyle = gold
-  context.font = '400 108px "Pirata One"'
-  context.fillText('2026', WIDTH - MARGIN, 190)
-  context.textAlign = 'left'
-
-  context.font = '500 12px "Manrope"'
+  context.font = '500 13.5px "Manrope"'
   context.fillStyle = 'rgba(239, 231, 214, 0.48)'
   context.fillText(
     `${categories.length} номинаций · один голос в каждой · голосование до ${EVENT.votingEndLabel}`,
     MARGIN,
-    226,
+    252,
   )
 
-  drawRule(context, 252)
+  drawRule(context, 278)
 
   const columns = 2
-  const columnGap = 38
+  const columnGap = 40
   const cellWidth = (WIDTH - MARGIN * 2 - columnGap) / columns
-  const rowHeight = 106
-  const gridTop = 286
+  const rowHeight = 108
+  const gridTop = 312
 
   categories.forEach((category, index) => {
     const column = index % columns
@@ -117,57 +108,41 @@ export async function createVotesPoster(votes: PosterVotes): Promise<Blob> {
 
     if (row > 0) {
       context.fillStyle = 'rgba(205, 181, 124, 0.11)'
-      context.fillRect(x, y - 20, cellWidth, 1)
+      context.fillRect(x, y - 22, cellWidth, 1)
     }
 
     context.beginPath()
-    context.arc(x + 4, y - 4, 2.4, 0, Math.PI * 2)
+    context.arc(x + 4, y - 5, 2.6, 0, Math.PI * 2)
     context.fillStyle = gold
     context.fill()
 
-    context.font = '700 13px "Manrope"'
-    context.fillStyle = 'rgba(236, 217, 167, 0.82)'
+    context.font = '700 15px "Manrope"'
+    context.fillStyle = 'rgba(236, 217, 167, 0.86)'
     const categoryTitle = fitText(
       context,
       category.title.toLocaleUpperCase('ru'),
-      cellWidth - 22,
+      cellWidth - 24,
     )
-    context.fillText(categoryTitle, x + 16, y)
+    context.fillText(categoryTitle, x + 18, y)
 
     const nominee = category.nominees.find((item) =>
       votes[category.id]?.picks.includes(item.id),
     )
 
     if (nominee) {
-      context.font = '600 24px "Cormorant Garamond"'
+      context.font = '600 30px "Cormorant Garamond"'
       context.fillStyle = cream
-      context.fillText(fitText(context, nominee.name, cellWidth - 16), x, y + 34)
+      context.fillText(fitText(context, nominee.name, cellWidth - 18), x, y + 38)
 
-      context.font = '500 12px "Manrope"'
-      context.fillStyle = 'rgba(239, 231, 214, 0.46)'
-      context.fillText(nominee.handle, x, y + 54)
+      context.font = '500 13px "Manrope"'
+      context.fillStyle = 'rgba(239, 231, 214, 0.5)'
+      context.fillText(nominee.handle, x, y + 60)
     } else {
-      context.font = '500 18px "Manrope"'
+      context.font = '500 22px "Manrope"'
       context.fillStyle = 'rgba(239, 231, 214, 0.24)'
-      context.fillText('—', x, y + 35)
+      context.fillText('—', x, y + 38)
     }
   })
-
-  drawRule(context, 1272)
-
-  context.font = '600 11px "Manrope"'
-  context.fillStyle = gold
-  context.fillText('ИТД ИТП', MARGIN, 1310)
-  context.fillStyle = 'rgba(239, 231, 214, 0.42)'
-  context.fillText(`ИТОГИ ${EVENT.winnersLabel.toLocaleUpperCase('ru')}`, MARGIN, 1332)
-
-  context.textAlign = 'right'
-  context.font = '500 12px "Manrope"'
-  context.fillStyle = 'rgba(239, 231, 214, 0.52)'
-  context.fillText('t.me/itditp', WIDTH - MARGIN, 1310)
-  context.fillStyle = 'rgba(239, 231, 214, 0.34)'
-  context.fillText('@sneyr', WIDTH - MARGIN, 1332)
-  context.textAlign = 'left'
 
   return new Promise((resolve, reject) => {
     canvas.toBlob((blob) => {

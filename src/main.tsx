@@ -17,16 +17,19 @@ import './styles.css'
 import App from './App'
 import { ScrollToTop } from './components/ScrollToTop'
 import { ToastProvider } from './context/ToastContext'
+import { TicketProvider } from './context/TicketContext'
 import { VotesProvider } from './context/VotesContext'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <BrowserRouter>
       <ToastProvider>
-        <VotesProvider>
-          <ScrollToTop />
-          <App />
-        </VotesProvider>
+        <TicketProvider>
+          <VotesProvider>
+            <ScrollToTop />
+            <App />
+          </VotesProvider>
+        </TicketProvider>
       </ToastProvider>
     </BrowserRouter>
   </StrictMode>,
