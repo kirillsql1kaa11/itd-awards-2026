@@ -1,25 +1,26 @@
 import { useEffect, useRef } from 'react'
 import { ArrowLeft, ArrowRight, X } from 'lucide-react'
+import { NomineeArtwork } from './NomineeArtwork'
+import type { Nominee } from '../data/categories'
 
-export type LightboxPhoto = {
-  src: string
-  alt: string
-  name: string
+export type LightboxItem = {
+  nominee: Nominee
+  categoryId: string
   category: string
 }
 
-type PhotoLightboxProps = {
-  photos: LightboxPhoto[]
+type NomineeLightboxProps = {
+  items: LightboxItem[]
   index: number
   onClose: () => void
   onNavigate: (index: number) => void
 }
 
-export function PhotoLightbox({ photos, index, onClose, onNavigate }: PhotoLightboxProps) {
+export function NomineeLightbox({ items, index, onClose, onNavigate }: NomineeLightboxProps) {
   const dialogRef = useRef<HTMLDialogElement>(null)
   const closeRef = useRef<HTMLButtonElement>(null)
   const previousFocus = useRef<HTMLElement | null>(null)
-  const photo = photos[index]
+  const item = items[index]
 
   useEffect(() => {
     previousFocus.current = document.activeElement as HTMLElement | null
@@ -38,24 +39,25 @@ export function PhotoLightbox({ photos, index, onClose, onNavigate }: PhotoLight
 
   useEffect(() => {
     const handleKey = (event: KeyboardEvent) => {
-      if (photos.length < 2) return
+      if (items.length < 2) return
       if (event.key === 'ArrowRight') {
         event.preventDefault()
-        onNavigate((index + 1) % photos.length)
+        onNavigate((index + 1) % items.length)
       }
       if (event.key === 'ArrowLeft') {
         event.preventDefault()
-        onNavigate((index - 1 + photos.length) % photos.length)
+        onNavigate((index - 1 + items.length) % items.length)
       }
     }
     window.addEventListener('keydown', handleKey)
     return () => window.removeEventListener('keydown', handleKey)
-  }, [index, photos.length, onNavigate])
+  }, [index, items.length, onNavigate])
 
-  if (!photo) return null
+  if (!item) return null
 
-  const previous = photos[(index - 1 + photos.length) % photos.length]
-  const next = photos[(index + 1) % photos.length]
+  const previous = items[(index - 1 + items.length) % items.length]
+  const next = items[(index + 1) % items.length]
+  const description = item.nominee.photoAlt ?? item.nominee.tagline
 
   return (
     <dialog
@@ -73,38 +75,42 @@ export function PhotoLightbox({ photos, index, onClose, onNavigate }: PhotoLight
       <div className="lightbox__panel">
         <div className="lightbox__bar">
           <div>
-            <p className="eyebrow">{photo.category}</p>
-            <h2 id="lightbox-title">{photo.name}</h2>
+            <p className="eyebrow">{item.category}</p>
+            <h2 id="lightbox-title">{item.nominee.name}</h2>
           </div>
           <button
             ref={closeRef}
             type="button"
             className="lightbox__close"
             onClick={onClose}
-            aria-label="Закрыть фото"
+            aria-label="Закрыть изображение"
           >
             <X size={20} aria-hidden="true" />
           </button>
         </div>
 
         <div className="lightbox__stage">
-          {photos.length > 1 && (
+          {items.length > 1 && (
             <button
               type="button"
               className="lightbox__nav lightbox__nav--prev"
-              onClick={() => onNavigate((index - 1 + photos.length) % photos.length)}
-              aria-label={`Предыдущее фото: ${previous.name}`}
+              onClick={() => onNavigate((index - 1 + items.length) % items.length)}
+              aria-label={`Предыдущее изображение: ${previous.nominee.name}`}
             >
               <ArrowLeft size={20} aria-hidden="true" />
             </button>
           )}
-          <img src={photo.src} alt={photo.alt} draggable={false} />
-          {photos.length > 1 && (
+          <NomineeArtwork
+            nominee={item.nominee}
+            categoryId={item.categoryId}
+            className="lightbox__art"
+          />
+          {items.length > 1 && (
             <button
               type="button"
               className="lightbox__nav lightbox__nav--next"
-              onClick={() => onNavigate((index + 1) % photos.length)}
-              aria-label={`Следующее фото: ${next.name}`}
+              onClick={() => onNavigate((index + 1) % items.length)}
+              aria-label={`Следующее изображение: ${next.nominee.name}`}
             >
               <ArrowRight size={20} aria-hidden="true" />
             </button>
@@ -112,9 +118,9 @@ export function PhotoLightbox({ photos, index, onClose, onNavigate }: PhotoLight
         </div>
 
         <div className="lightbox__foot">
-          <span>{photo.alt}</span>
+          <span>{description}</span>
           <span className="lightbox__counter">
-            {index + 1} / {photos.length}
+            {index + 1} / {items.length}
           </span>
         </div>
       </div>

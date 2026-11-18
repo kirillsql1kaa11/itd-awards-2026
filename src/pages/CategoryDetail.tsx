@@ -27,8 +27,8 @@ import { ITD_CHANNEL_URL } from '../data/contacts'
 import { CategoryIcon } from '../components/CategoryIcon'
 import { NomineeArtwork } from '../components/NomineeArtwork'
 import { getNomineeVisual } from '../lib/nomineeVisual'
-import { PhotoLightbox } from '../components/PhotoLightbox'
-import type { LightboxPhoto } from '../components/PhotoLightbox'
+import { NomineeLightbox } from '../components/NomineeLightbox'
+import type { LightboxItem } from '../components/NomineeLightbox'
 import { TicketModal } from '../components/TicketModal'
 import { TrackPlayer } from '../components/TrackPlayer'
 import { NotFound } from './NotFound'
@@ -77,15 +77,13 @@ function CategoryView({ category }: { category: Category }) {
     draft.includes(nomineeItem.id),
   )
   const saved = savedPicks.length > 0
-  const photoNominees = orderedNominees.filter((nomineeItem) => nomineeItem.photo)
-  const lightboxPhotos: LightboxPhoto[] = photoNominees.map((nomineeItem) => ({
-    src: nomineeItem.photo ?? '',
-    alt: nomineeItem.photoAlt ?? nomineeItem.name,
-    name: nomineeItem.name,
+  const lightboxItems: LightboxItem[] = orderedNominees.map((nomineeItem) => ({
+    nominee: nomineeItem,
+    categoryId: category.id,
     category: category.title,
   }))
-  const openPhoto = (nomineeId: string) => {
-    const index = photoNominees.findIndex((nomineeItem) => nomineeItem.id === nomineeId)
+  const openLightbox = (nomineeId: string) => {
+    const index = orderedNominees.findIndex((nomineeItem) => nomineeItem.id === nomineeId)
     if (index >= 0) setLightboxIndex(index)
   }
 
@@ -263,7 +261,7 @@ function CategoryView({ category }: { category: Category }) {
                       editing={editing}
                       index={index}
                       onToggle={() => toggleNominee(nomineeItem.id)}
-                      onOpenPhoto={() => openPhoto(nomineeItem.id)}
+                      onOpenLightbox={() => openLightbox(nomineeItem.id)}
                       buttonRef={index === 0 ? firstNomineeRef : undefined}
                     />
                   )
@@ -378,8 +376,8 @@ function CategoryView({ category }: { category: Category }) {
       </section>
 
       {lightboxIndex !== null && (
-        <PhotoLightbox
-          photos={lightboxPhotos}
+        <NomineeLightbox
+          items={lightboxItems}
           index={lightboxIndex}
           onClose={() => setLightboxIndex(null)}
           onNavigate={setLightboxIndex}
@@ -400,7 +398,7 @@ type NomineeCardProps = {
   editing: boolean
   index: number
   onToggle: () => void
-  onOpenPhoto: () => void
+  onOpenLightbox: () => void
   buttonRef?: RefObject<HTMLButtonElement | null>
 }
 
@@ -411,7 +409,7 @@ function NomineeCard({
   editing,
   index,
   onToggle,
-  onOpenPhoto,
+  onOpenLightbox,
   buttonRef,
 }: NomineeCardProps) {
   const visual = getNomineeVisual(categoryId, nominee)
@@ -435,27 +433,26 @@ function NomineeCard({
 
       <div className="nominee__media">
         {visual === 'photo' ? (
-          <>
-            <NomineeArtwork
-              nominee={nominee}
-              categoryId={categoryId}
-              className="nominee__photo-img"
-            />
-            <button
-              type="button"
-              className="nominee__zoom"
-              onClick={onOpenPhoto}
-              aria-label={`Открыть фото крупнее: ${nominee.photoAlt ?? nominee.name}`}
-            >
-              <Maximize2 size={13} aria-hidden="true" />
-              Увеличить
-            </button>
-          </>
+          <NomineeArtwork
+            nominee={nominee}
+            categoryId={categoryId}
+            className="nominee__photo-img"
+          />
         ) : (
           <span className="nominee__art" aria-hidden="true">
             <NomineeArtwork nominee={nominee} categoryId={categoryId} />
           </span>
         )}
+
+        <button
+          type="button"
+          className="nominee__zoom"
+          onClick={onOpenLightbox}
+          aria-label={`Открыть изображение крупнее: ${nominee.photoAlt ?? nominee.name}`}
+        >
+          <Maximize2 size={13} aria-hidden="true" />
+          Увеличить
+        </button>
 
         <span className="nominee__number" aria-hidden="true">
           {number}

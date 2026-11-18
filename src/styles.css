@@ -4678,6 +4678,14 @@ main:focus {
   object-fit: contain;
 }
 
+.lightbox__stage svg.lightbox__art {
+  display: block;
+  width: min(100%, 70svh);
+  height: auto;
+  max-height: min(70svh, 780px);
+  aspect-ratio: 1;
+}
+
 .lightbox__nav {
   position: absolute;
   top: 50%;
