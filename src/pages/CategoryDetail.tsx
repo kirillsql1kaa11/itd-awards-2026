@@ -54,14 +54,6 @@ export function CategoryDetail() {
   return <CategoryView category={category} key={category.id} />
 }
 
-const categoryKickers: Record<string, string> = {
-  'meme-goda': 'Мем',
-  'project-goda': 'Проект',
-  'zavoz-goda': 'Завоз',
-  'event-goda': 'Событие',
-  'track-goda': 'Трек',
-}
-
 function CategoryView({ category }: { category: Category }) {
   const { votes, saveVote } = useVotes()
   const { ticket, activateTicket } = useTicket()
@@ -92,8 +84,6 @@ function CategoryView({ category }: { category: Category }) {
     name: nomineeItem.name,
     category: category.title,
   }))
-  const kicker = categoryKickers[category.id] ?? 'Автор'
-
   const openPhoto = (nomineeId: string) => {
     const index = photoNominees.findIndex((nomineeItem) => nomineeItem.id === nomineeId)
     if (index >= 0) setLightboxIndex(index)
@@ -269,8 +259,6 @@ function CategoryView({ category }: { category: Category }) {
                       key={nomineeItem.id}
                       nominee={nomineeItem}
                       categoryId={category.id}
-                      groupLabel={groupLabels[category.group]}
-                      kicker={kicker}
                       selected={isSelected}
                       editing={editing}
                       index={index}
@@ -408,8 +396,6 @@ function CategoryView({ category }: { category: Category }) {
 type NomineeCardProps = {
   nominee: Nominee
   categoryId: string
-  groupLabel: string
-  kicker: string
   selected: boolean
   editing: boolean
   index: number
@@ -421,8 +407,6 @@ type NomineeCardProps = {
 function NomineeCard({
   nominee,
   categoryId,
-  groupLabel,
-  kicker,
   selected,
   editing,
   index,
@@ -473,29 +457,6 @@ function NomineeCard({
           </span>
         )}
 
-        {visual !== 'photo' && (
-          <div className="nominee__overlay">
-            <span className="nominee__kicker">
-              {kicker}
-              <span className="nominee__kicker-sep" aria-hidden="true">
-                /
-              </span>
-              {groupLabel}
-            </span>
-            <h3 className="nominee__name">{nominee.name}</h3>
-            <a
-              className="nominee__profile"
-              href={ITD_CHANNEL_URL}
-              target="_blank"
-              rel="noreferrer"
-              aria-label={`Канал ИТД ИТП в Telegram`}
-            >
-              {nominee.handle}
-              <ArrowUpRight size={10} aria-hidden="true" />
-            </a>
-          </div>
-        )}
-
         <span className="nominee__number" aria-hidden="true">
           {number}
         </span>
@@ -505,23 +466,17 @@ function NomineeCard({
       </div>
 
       <div className="nominee__body">
-        {visual === 'photo' ? (
-          <>
-            <h3 className="nominee__name nominee__name--below">{nominee.name}</h3>
-            <a
-              className="nominee__profile nominee__profile--below"
-              href={ITD_CHANNEL_URL}
-              target="_blank"
-              rel="noreferrer"
-              aria-label={`Канал ИТД ИТП в Telegram`}
-            >
-              {nominee.handle}
-              <ArrowUpRight size={10} aria-hidden="true" />
-            </a>
-          </>
-        ) : (
-          <p className="nominee__tagline">{nominee.tagline}</p>
-        )}
+        <h3 className="nominee__name nominee__name--below">{nominee.name}</h3>
+        <a
+          className="nominee__profile nominee__profile--below"
+          href={ITD_CHANNEL_URL}
+          target="_blank"
+          rel="noreferrer"
+          aria-label={`Канал ИТД ИТП в Telegram`}
+        >
+          {nominee.handle}
+          <ArrowUpRight size={10} aria-hidden="true" />
+        </a>
         {nominee.song && (
           <span className="nominee__song">
             <Music2 size={11} aria-hidden="true" />
