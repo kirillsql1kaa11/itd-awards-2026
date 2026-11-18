@@ -276,18 +276,20 @@ function CategoryView({ category }: { category: Category }) {
             </div>
 
             <aside className="vote-panel" aria-labelledby="vote-panel-title">
-              <div className="vote-panel__head">
-                <p className="eyebrow">Ваш голос</p>
-                {ticket && (
-                  <span className="vote-panel__ticket">
-                    <Ticket size={12} aria-hidden="true" />
-                    {ticket.number}
-                  </span>
-                )}
+              <div className="vote-panel__intro">
+                <div className="vote-panel__head">
+                  <p className="eyebrow">Ваш голос</p>
+                  {ticket && (
+                    <span className="vote-panel__ticket">
+                      <Ticket size={12} aria-hidden="true" />
+                      {ticket.number}
+                    </span>
+                  )}
+                </div>
+                <h2 id="vote-panel-title">
+                  {saved && !editing ? 'Голос учтён' : 'Сделайте выбор'}
+                </h2>
               </div>
-              <h2 id="vote-panel-title">
-                {saved && !editing ? 'Голос учтён' : 'Сделайте выбор'}
-              </h2>
 
               <ul className="picked-list">
                 {selectedNominees.length > 0 ? (
@@ -316,27 +318,29 @@ function CategoryView({ category }: { category: Category }) {
                 )}
               </ul>
 
-              {error && (
-                <p className="form-error" role="alert">
-                  {error}
-                </p>
-              )}
+              <div className="vote-panel__action">
+                {error && (
+                  <p className="form-error" role="alert">
+                    {error}
+                  </p>
+                )}
 
-              {editing ? (
-                <button type="button" className="button button--gold vote-panel__button" onClick={handleSave}>
-                  Сохранить голос
-                  <Check size={17} aria-hidden="true" />
-                </button>
-              ) : (
-                <button
-                  type="button"
-                  className="button button--ghost vote-panel__button"
-                  onClick={handleEdit}
-                >
-                  Изменить голос
-                  <Pencil size={15} aria-hidden="true" />
-                </button>
-              )}
+                {editing ? (
+                  <button type="button" className="button button--gold vote-panel__button" onClick={handleSave}>
+                    Сохранить голос
+                    <Check size={17} aria-hidden="true" />
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    className="button button--ghost vote-panel__button"
+                    onClick={handleEdit}
+                  >
+                    Изменить голос
+                    <Pencil size={15} aria-hidden="true" />
+                  </button>
+                )}
+              </div>
             </aside>
           </div>
 
