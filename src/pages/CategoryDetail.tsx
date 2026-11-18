@@ -236,7 +236,7 @@ function CategoryView({ category }: { category: Category }) {
       <section className="section category-vote-section">
         <div className="container">
           <div className="vote-layout">
-            <div className="nominees-column">
+            <div className="vote-layout__head">
               {saved && editing && (
                 <div className="saved-strip saved-strip--editing">
                   <Pencil size={17} aria-hidden="true" />
@@ -258,7 +258,9 @@ function CategoryView({ category }: { category: Category }) {
                   <span>{draft.length > 0 ? 'Номинант выбран' : 'Голос не отдан'}</span>
                 </div>
               </div>
+            </div>
 
+            <div className="vote-layout__cards">
               <div className="nominee-list">
                 {orderedNominees.map((nomineeItem, index) => {
                   const isSelected = draft.includes(nomineeItem.id)
