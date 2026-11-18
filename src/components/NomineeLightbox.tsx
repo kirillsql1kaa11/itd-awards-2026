@@ -88,7 +88,7 @@ export function NomineeLightbox({ items, index, onClose, onNavigate }: NomineeLi
           </button>
         </div>
 
-        <div className="lightbox__stage">
+        <div className="lightbox__viewport">
           {items.length > 1 && (
             <button
               type="button"
@@ -99,12 +99,14 @@ export function NomineeLightbox({ items, index, onClose, onNavigate }: NomineeLi
               <ArrowLeft size={20} aria-hidden="true" />
             </button>
           )}
-          <NomineeArtwork
-            key={item.nominee.id}
-            nominee={item.nominee}
-            categoryId={item.categoryId}
-            className="lightbox__art"
-          />
+          <div className="lightbox__stage">
+            <NomineeArtwork
+              key={item.nominee.id}
+              nominee={item.nominee}
+              categoryId={item.categoryId}
+              className="lightbox__art"
+            />
+          </div>
           {items.length > 1 && (
             <button
               type="button"

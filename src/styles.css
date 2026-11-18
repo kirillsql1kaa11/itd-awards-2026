@@ -4639,6 +4639,15 @@ main:focus {
   background: rgba(236, 217, 167, 0.1);
 }
 
+.lightbox__viewport {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-width: 0;
+}
+
 .lightbox__stage {
   position: relative;
   display: flex;
@@ -4728,6 +4737,23 @@ main:focus {
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
+  }
+}
+
+@media (min-width: 900px) {
+  .lightbox__viewport {
+    gap: 16px;
+  }
+
+  .lightbox__nav {
+    position: static;
+    transform: none;
+  }
+}
+
+@media (min-width: 1200px) {
+  .lightbox__viewport {
+    gap: 24px;
   }
 }
 
