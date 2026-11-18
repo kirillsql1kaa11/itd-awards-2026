@@ -5137,6 +5137,17 @@ main:focus {
   font-size: clamp(1rem, 1.2vw, 1.18rem);
 }
 
+.nominee--photo .nominee__name--below {
+  font-size: clamp(1.05rem, 1.45vw, 1.25rem);
+  line-height: 1.08;
+}
+
+.nominee--photo .nominee__profile--below {
+  margin-top: 0;
+  padding: 0;
+  font-size: 9.5px;
+}
+
 .vote-panel__ticket {
   display: inline-flex;
   align-items: center;

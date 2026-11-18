@@ -28,7 +28,7 @@ export const groupLabels: Record<CategoryGroup, string> = {
 const nomineePhotos: Record<string, { src: string; alt: string }> = {
   itdking: {
     src: '/images/nominee-itdking.png',
-    alt: 'Портрет itdking в чёрном костюме с золотой вышивкой в круглой золотой раме',
+    alt: 'Портрет ктсупер[113] в чёрном костюме с золотой вышивкой в круглой золотой раме',
   },
   'kot-admin': {
     src: '/images/meme-kot-admin.svg',
@@ -141,7 +141,7 @@ export const categories: Category[] = [
     'people',
     'Тот, кто задаёт тон, собирает вокруг себя людей и делает сообщество громче. Один голос — один король.',
     [
-      nominee('itdking', 'itdking', '@ktsuper113', 'Держит внимание сообщества и задаёт тон в каждом эфире.'),
+      nominee('itdking', 'ктсупер[113]', '@ktsuper113', 'Держит внимание сообщества и задаёт тон в каждом эфире.'),
       nominee('mark-morph', 'Марк «MORPH» Ветров', '@morphcore', 'Собрал вокруг себя полсообщества и никого не потерял.'),
       nominee('danya-nocturne', 'Даня Ноктюрн', '@nocturne', 'Ночной голос ITD и автор главных тредов года.'),
       nominee('alex-sable', 'Алекс «Sable»', '@sable', 'Архитектор движа, мемов и внезапных коллабов.'),

@@ -473,26 +473,28 @@ function NomineeCard({
           </span>
         )}
 
-        <div className="nominee__overlay">
-          <span className="nominee__kicker">
-            {kicker}
-            <span className="nominee__kicker-sep" aria-hidden="true">
-              /
+        {visual !== 'photo' && (
+          <div className="nominee__overlay">
+            <span className="nominee__kicker">
+              {kicker}
+              <span className="nominee__kicker-sep" aria-hidden="true">
+                /
+              </span>
+              {groupLabel}
             </span>
-            {groupLabel}
-          </span>
-          <h3 className="nominee__name">{nominee.name}</h3>
-          <a
-            className="nominee__profile"
-            href={ITD_CHANNEL_URL}
-            target="_blank"
-            rel="noreferrer"
-            aria-label={`Канал ИТД ИТП в Telegram`}
-          >
-            {nominee.handle}
-            <ArrowUpRight size={10} aria-hidden="true" />
-          </a>
-        </div>
+            <h3 className="nominee__name">{nominee.name}</h3>
+            <a
+              className="nominee__profile"
+              href={ITD_CHANNEL_URL}
+              target="_blank"
+              rel="noreferrer"
+              aria-label={`Канал ИТД ИТП в Telegram`}
+            >
+              {nominee.handle}
+              <ArrowUpRight size={10} aria-hidden="true" />
+            </a>
+          </div>
+        )}
 
         <span className="nominee__number" aria-hidden="true">
           {number}
@@ -503,7 +505,23 @@ function NomineeCard({
       </div>
 
       <div className="nominee__body">
-        <p className="nominee__tagline">{nominee.tagline}</p>
+        {visual === 'photo' ? (
+          <>
+            <h3 className="nominee__name nominee__name--below">{nominee.name}</h3>
+            <a
+              className="nominee__profile nominee__profile--below"
+              href={ITD_CHANNEL_URL}
+              target="_blank"
+              rel="noreferrer"
+              aria-label={`Канал ИТД ИТП в Telegram`}
+            >
+              {nominee.handle}
+              <ArrowUpRight size={10} aria-hidden="true" />
+            </a>
+          </>
+        ) : (
+          <p className="nominee__tagline">{nominee.tagline}</p>
+        )}
         {nominee.song && (
           <span className="nominee__song">
             <Music2 size={11} aria-hidden="true" />
