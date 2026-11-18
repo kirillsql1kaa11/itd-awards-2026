@@ -5094,10 +5094,12 @@ main:focus {
 
 .track-player__wave {
   justify-content: space-between;
+  gap: 1px;
 }
 
 .track-player__wave span {
-  flex: 1 1 2px;
+  flex: 1 1 0;
+  min-width: 0;
   max-width: none;
 }
 

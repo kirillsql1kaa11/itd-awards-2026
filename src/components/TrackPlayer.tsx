@@ -13,7 +13,7 @@ function makeBars(seed: string): number[] {
     hash ^= seed.charCodeAt(index)
     hash = Math.imul(hash, 16777619)
   }
-  return Array.from({ length: 44 }, (_, index) => {
+  return Array.from({ length: 40 }, (_, index) => {
     const value = Math.abs(Math.sin((hash + index * 47) * 0.013))
     return 24 + Math.round(value * 68)
   })
