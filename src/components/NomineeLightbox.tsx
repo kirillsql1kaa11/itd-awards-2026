@@ -57,7 +57,6 @@ export function NomineeLightbox({ items, index, onClose, onNavigate }: NomineeLi
 
   const previous = items[(index - 1 + items.length) % items.length]
   const next = items[(index + 1) % items.length]
-  const description = item.nominee.photoAlt ?? item.nominee.tagline
 
   return (
     <dialog
@@ -101,6 +100,7 @@ export function NomineeLightbox({ items, index, onClose, onNavigate }: NomineeLi
             </button>
           )}
           <NomineeArtwork
+            key={item.nominee.id}
             nominee={item.nominee}
             categoryId={item.categoryId}
             className="lightbox__art"
@@ -115,13 +115,6 @@ export function NomineeLightbox({ items, index, onClose, onNavigate }: NomineeLi
               <ArrowRight size={20} aria-hidden="true" />
             </button>
           )}
-        </div>
-
-        <div className="lightbox__foot">
-          <span>{description}</span>
-          <span className="lightbox__counter">
-            {index + 1} / {items.length}
-          </span>
         </div>
       </div>
     </dialog>

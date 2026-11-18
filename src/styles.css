@@ -4584,7 +4584,7 @@ main:focus {
 .lightbox[open] {
   display: grid;
   place-items: center;
-  animation: lightbox-in 0.22s ease both;
+  animation: lightbox-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 .lightbox::backdrop {
@@ -4642,8 +4642,11 @@ main:focus {
 .lightbox__stage {
   position: relative;
   display: flex;
+  align-self: center;
   align-items: center;
   justify-content: center;
+  width: fit-content;
+  max-width: 100%;
   min-height: 0;
   overflow: hidden;
   border: 1px solid var(--line);
@@ -4662,10 +4665,15 @@ main:focus {
 
 .lightbox__stage svg.lightbox__art {
   display: block;
-  width: min(100%, 70svh);
+  width: min(70svh, 820px);
+  max-width: 100%;
   height: auto;
   max-height: min(70svh, 780px);
   aspect-ratio: 1;
+}
+
+.lightbox__stage .lightbox__art {
+  animation: lightbox-art-in 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 .lightbox__nav {
@@ -4701,34 +4709,25 @@ main:focus {
   right: 14px;
 }
 
-.lightbox__foot {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 20px;
-  color: var(--muted);
-  font-size: 9.5px;
-  line-height: 1.5;
-}
-
-.lightbox__foot > span:first-child {
-  max-width: 68ch;
-}
-
-.lightbox__counter {
-  flex: none;
-  color: var(--gold);
-  font-size: 9px;
-  font-weight: 800;
-  letter-spacing: 0.12em;
-}
-
 @keyframes lightbox-in {
   from {
     opacity: 0;
+    transform: translateY(18px) scale(0.96);
   }
   to {
     opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes lightbox-art-in {
+  from {
+    opacity: 0;
+    transform: translateY(12%) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
   }
 }
 
@@ -4785,12 +4784,6 @@ main:focus {
 
   .lightbox__nav--next {
     right: 7px;
-  }
-
-  .lightbox__foot {
-    flex-direction: column;
-    gap: 3px;
-    font-size: 9px;
   }
 }
 
